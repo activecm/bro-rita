@@ -7,6 +7,7 @@ include(BroPlugin)
 
 bro_plugin_begin(OCMDev bro_mongodb)
 bro_plugin_cc(src/Plugin.cc)
+bro_plugin_cc(src/MongoWriter.cc)
 bro_plugin_bif(src/bro_mongodb.bif)
 bro_plugin_dist_files(README CHANGES COPYING VERSION)
 bro_plugin_end()
