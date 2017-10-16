@@ -3,7 +3,6 @@
 #define BRO_PLUGIN_OCMDEV_BRO_MONGODB
 
 #include <plugin/Plugin.h>
-#include "MongoWriter.h"
 
 namespace plugin {
 namespace OCMDev_bro_mongodb {

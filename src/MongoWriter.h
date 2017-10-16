@@ -1,5 +1,8 @@
 #ifndef LOGGING_WRITER_MONGO_H
 #define LOGGING_WRITER_MONGO_H
+#include <threading/SerialTypes.h>
+#include <logging/WriterBackend.h>
+
 namespace logging { namespace writer {
 
 class MongoDB : public WriterBackend {
