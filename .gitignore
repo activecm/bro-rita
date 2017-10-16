@@ -1,3 +1,5 @@
 build/
+.state/
 *.swp
 *.log
+
