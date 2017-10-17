@@ -1,5 +1,19 @@
 #include "MongoWriter.h"
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include <bsoncxx/json.hpp>
+#include <mongocxx/instance.hpp>
+#include <mongocxx/client.hpp>
+#include <mongocxx/stdx.hpp>
+#include <mongocxx/uri.hpp>
 
+using bsoncxx::builder::stream::close_array;
+using bsoncxx::builder::stream::close_document;
+using bsoncxx::builder::stream::document;
+using bsoncxx::builder::stream::finalize;
+using bsoncxx::builder::stream::open_array;
+using bsoncxx::builder::stream::open_document;
 using namespace logging;
 using namespace writer;
 
@@ -30,6 +44,7 @@ bool MongoDB::DoInit(const WriterInfo& info, int num_fields,
 
         std::cout << std::endl;
     }
+    mongocxx::instance instance{};
     return true;
 }
 
