@@ -2,14 +2,14 @@
 #include "Plugin.h"
 #include "MongoWriter.h"
 
-namespace plugin { namespace OCMDev_bro_mongodb { Plugin plugin; } }
+namespace plugin { namespace OCMDev_MongoDBWriter { Plugin plugin; }}
 
-using namespace plugin::OCMDev_bro_mongodb;
+using namespace plugin::OCMDev_MongoDBWriter;
 
 plugin::Configuration Plugin::Configure() {
     AddComponent(new ::logging::Component("MongoDB", ::logging::writer::MongoDB::Instantiate));
     plugin::Configuration config;
-    config.name = "OCMDev::bro_mongodb";
+    config.name = "OCMDev::MongoDBWriter";
     config.description = "Writes bro logs to MongoDB";
     config.version.major = 0;
     config.version.minor = 1;

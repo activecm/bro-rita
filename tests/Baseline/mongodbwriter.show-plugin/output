@@ -1,0 +1,4 @@
+OCMDev::MongoDBWriter - Writes bro logs to MongoDB (dynamic, version 0.1)
+    [Writer] MongoDB (Log::WRITER_MONGODB)
+    [Constant] LogMongo::debug
+

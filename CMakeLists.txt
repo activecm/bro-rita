@@ -1,7 +1,11 @@
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.1)
 
-project(BroPluginbro_mongodb)
+project(BroPluginMongoDBWriter)
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(BroPlugin)
 
@@ -10,8 +14,6 @@ find_package(PkgConfig)
 pkg_search_module(LIBMONGOCXX REQUIRED libmongocxx)
 pkg_search_module(LIBBSONCXX REQUIRED libbsoncxx)
 
-#include_directories(${LIBMONGOCXX_INCLUDE_DIRS})
-#include_directories(${LIBBSONCXX_INCLUDE_DIRS})
 include_directories("/usr/local/include/mongocxx/v_noabi")
 include_directories("/usr/local/include/bsoncxx/v_noabi")
 include_directories("/usr/local/include/libmongoc-1.0")
@@ -21,10 +23,11 @@ include_directories("/usr/local/lib")
 link_directories(${LIBMONGOCXX_LIBRARY_DIRS})
 link_directories(${LIBBSONCXX_LIBRARY_DIRS})
 
-bro_plugin_begin(OCMDev bro_mongodb)
+bro_plugin_begin(OCMDev MongoDBWriter)
+bro_plugin_bif(src/MongoDBWriter.bif)
+bro_plugin_cc(src/MongoConv.cc)
 bro_plugin_cc(src/Plugin.cc)
 bro_plugin_cc(src/MongoWriter.cc)
-bro_plugin_bif(src/bro_mongodb.bif)
 bro_plugin_dist_files(README CHANGES COPYING VERSION)
 bro_plugin_link_library(${LIBMONGOCXX_LIBRARIES})
 bro_plugin_link_library(${LIBBSONCXX_LIBRARIES})
