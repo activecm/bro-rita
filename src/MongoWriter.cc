@@ -4,6 +4,10 @@
 #include <bsoncxx/json.hpp>
 #include <mongocxx/instance.hpp>
 #include <mongocxx/client.hpp>
+#include <cstdint>
+#include <iostream>
+#include <string>
+#include <vector>
 
 using bsoncxx::builder::stream::close_array;
 using bsoncxx::builder::stream::close_document;
@@ -44,7 +48,7 @@ bool MongoDB::DoInit(const WriterInfo &info, int num_fields,
         for (int i = 0; i < num_fields; i++) {
             const Field *field = fields[i];
             std::cout << "  field " << field->name << ": "
-                      << type_name(field->type) << std::endl;
+                << type_name(field->type) << std::endl;
         }
 
         std::cout << std::endl;
@@ -65,6 +69,52 @@ bool MongoDB::DoWrite(int num_fields, const Field *const *fields, Value **vals) 
     }
 
     std::cout << std::endl;
+
+    mongocxx::uri uri("mongodb://localhost:27017");
+    mongocxx::client client(uri);
+    mongocxx::database db = client["mydb"];
+    mongocxx::collection coll = db["test"];
+
+    auto builder = bsoncxx::builder::stream::document{};
+
+        string s1;
+    for (int i = 0; i < num_fields; i++) {
+        const threading::Value* value = vals[i];
+        s1 = fields[i]->name;
+        while( s1.find('.') != std::string::npos )
+        s1.erase( s1.find('.'), s1.find('.') );
+        if (!value->present) {
+            builder << s1 << " empyt ";
+        } else {
+            switch (value->type) {
+                case TYPE_BOOL:
+                case TYPE_INT:
+                    builder << s1 << std::to_string(value->val.int_val);
+                    break;
+                case TYPE_COUNT:
+                case TYPE_COUNTER:
+                    builder << s1 << std::to_string(value->val.uint_val);
+                    break;
+                case TYPE_TIME:
+                case TYPE_INTERVAL:
+                case TYPE_DOUBLE:
+                    builder << s1 << (std::int64_t)(value->val.double_val);
+                    break;
+                default:
+                    builder << s1 << "empty";
+                    break;
+            }
+        }
+    }
+
+    bsoncxx::document::value doc_value  =
+        builder << bsoncxx::builder::stream::finalize;
+
+    bsoncxx::document::view view = doc_value.view();
+
+    bsoncxx::stdx::optional<mongocxx::result::insert_one> result 
+        = coll.insert_one(view);
+
     return true;
 }
 
