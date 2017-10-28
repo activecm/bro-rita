@@ -2,14 +2,20 @@
 #include "MongoConv.h"
 #include <algorithm>
 #include <bsoncxx/json.hpp>
+#include <bsoncxx/builder/stream/array.hpp>
+#include <bsoncxx/builder/stream/document.hpp>
+#include <bsoncxx/builder/stream/helpers.hpp>
+#include <bsoncxx/types.hpp>
 #include <mongocxx/instance.hpp>
 #include <mongocxx/client.hpp>
 
 using bsoncxx::builder::stream::close_array;
+using bsoncxx::builder::stream::array;
 using bsoncxx::builder::stream::close_document;
 using bsoncxx::builder::stream::document;
 using bsoncxx::builder::stream::finalize;
 using bsoncxx::builder::stream::open_array;
+using bsoncxx::builder::stream::open_document;
 using bsoncxx::builder::stream::open_document;
 
 #include <threading/formatters/Ascii.h>
@@ -30,7 +36,7 @@ MongoDB::MongoDB(WriterFrontend *frontend) :
 
     bool MongoDB::DoInit(const WriterInfo &info, int num_fields,
             const Field *const *fields) {
-        if (BifConst::LogMongo::debug) {
+        if (BifConst::LogMongo::debug && false) {
             std::cout << "[logging::writer::MongoDB]" << std::endl;
             std::cout << "  path=" << info.path << std::endl;
             std::cout << "  rotation_interval=" << info.rotation_interval << std::endl;
@@ -66,93 +72,24 @@ bool MongoDB::DoWrite(int num_fields, const Field *const *fields, Value **vals) 
     mongocxx::uri uri("mongodb://localhost:27017");
     mongocxx::client client(uri);
     mongocxx::database db = client["mydb"];
-    mongocxx::collection coll = db["test"];
+    mongocxx::collection coll = db["conn"];
 
     auto builder = bsoncxx::builder::stream::document{};
 
     for (int i = 0; i < num_fields; i++) {
-        const Value *value = vals[i];
-        tag = fields[i]->name;
-
-        while( tag.find('.') != std::string::npos )
-        {
-            tag[tag.find('.')] = '_';
-        }
-        if( value->present )
-        {
-            switch (value->type)
-            {
-                case TYPE_VOID:
-                    break;
-                case TYPE_BOOL:
-                case TYPE_INT:
-                    builder << tag << (int)(value->val.int_val);
-                    break;
-                case TYPE_COUNT:
-                    break;
-                case TYPE_COUNTER:
-                    break;
-                case TYPE_DOUBLE:
-                    builder << tag << (std::int64_t)(value->val.double_val);
-                    break;
-                case TYPE_TIME: 
-                    break;
-                case TYPE_INTERVAL:
-                    break;
-                case TYPE_PATTERN:
-                    break;
-                case TYPE_TIMER:
-                    break;
-                case TYPE_PORT:
-                    builder << tag << (int)(value->val.port_val.port);
-                    break;
-                case TYPE_ADDR:
-                    builder << tag << formatter->Render(value->val.addr_val);
-                    break;
-                case TYPE_SUBNET:
-                    builder << tag << formatter->Render(value->val.subnet_val);
-                    break;
-                case TYPE_ANY:
-                    break;
-                case TYPE_TABLE:
-                    break;
-                case TYPE_UNION:
-                    break;
-                case TYPE_RECORD:
-                    break;
-                case TYPE_LIST:
-                    break;
-                case TYPE_ENUM:
-                case TYPE_STRING:
-                case TYPE_FUNC: {
-            const auto length = static_cast<unsigned long>(
-                    value->val.string_val.length
-            );
-             builder << tag << string(value->val.string_val.data, length);
-                                }
-                    break;
-                case TYPE_FILE:
-                    break;
-                case TYPE_VECTOR:
-                    break;
-                case TYPE_OPAQUE:
-                    break;
-                case TYPE_TYPE:
-                    break;
-                case TYPE_ERROR:
-                    break;
-            }
-        }
-
-        bsoncxx::document::value doc_value  =
-            builder << bsoncxx::builder::stream::finalize;
-
-        bsoncxx::document::view view = doc_value.view();
-
-        bsoncxx::stdx::optional<mongocxx::result::insert_one> result 
-            = coll.insert_one(view);
-
+        addField(builder, fields[i], vals[i]);
     }
+
+    // End packet
+    bsoncxx::document::value doc_value  =
+        builder << bsoncxx::builder::stream::finalize;
+
+    //Aquire RO copy
+    bsoncxx::document::view view = doc_value.view();
+
+    //Place packet into collection
+    bsoncxx::stdx::optional<mongocxx::result::insert_one> result 
+        = coll.insert_one(view);
 
     return true;
 }

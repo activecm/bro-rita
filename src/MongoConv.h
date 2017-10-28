@@ -14,6 +14,9 @@
 namespace plugin {
     namespace OCMDev_MongoDBWriter {
 
+
+        string getTag( Field *const fields);
+        void addField( builder::stream::builder, const Field *const *fields, Value * value );
         std::tuple<bool, string>
         broToString(const threading::formatter::Ascii *const &formatter, const threading::Value *const &value);
     }
