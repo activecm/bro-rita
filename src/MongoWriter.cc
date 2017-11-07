@@ -1,16 +1,9 @@
 #include "MongoWriter.h"
-#include "MongoConv.h"
-#include <algorithm>
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/builder/stream/array.hpp>
-#include <bsoncxx/builder/stream/document.hpp>
-#include <bsoncxx/builder/stream/helpers.hpp>
-#include <bsoncxx/types.hpp>
+#include "DocBuilder.h"
 #include <mongocxx/instance.hpp>
 #include <mongocxx/client.hpp>
 
 using bsoncxx::builder::stream::close_array;
-using bsoncxx::builder::stream::array;
 using bsoncxx::builder::stream::close_document;
 using bsoncxx::builder::stream::document;
 using bsoncxx::builder::stream::finalize;
@@ -18,8 +11,6 @@ using bsoncxx::builder::stream::open_array;
 using bsoncxx::builder::stream::open_document;
 using bsoncxx::builder::stream::open_document;
 
-#include <threading/formatters/Ascii.h>
-#include <threading/SerialTypes.h>
 
 using namespace logging;
 using namespace writer;
@@ -30,13 +21,13 @@ using namespace formatter;
 
 MongoDB::MongoDB(WriterFrontend *frontend) :
     WriterBackend(frontend),
-    formatter(std::make_unique<const formatter::Ascii>(
+    formatter(new formatter::Ascii(
                 this, formatter::Ascii::SeparatorInfo()
                 )) {}
 
     bool MongoDB::DoInit(const WriterInfo &info, int num_fields,
             const Field *const *fields) {
-        if (BifConst::LogMongo::debug && false) {
+        if (BifConst::LogMongo::debug) {
             std::cout << "[logging::writer::MongoDB]" << std::endl;
             std::cout << "  path=" << info.path << std::endl;
             std::cout << "  rotation_interval=" << info.rotation_interval << std::endl;
@@ -73,23 +64,18 @@ bool MongoDB::DoWrite(int num_fields, const Field *const *fields, Value **vals) 
     mongocxx::client client(uri);
     mongocxx::database db = client["mydb"];
     mongocxx::collection coll = db["conn"];
-
-    auto builder = bsoncxx::builder::stream::document{};
+    auto builder = plugin::OCMDev_MongoDBWriter::DocBuilder(this->formatter);
 
     for (int i = 0; i < num_fields; i++) {
-        addField(builder, fields[i], vals[i]);
+        builder.addField(fields[i], vals[i]);
     }
 
     // End packet
-    bsoncxx::document::value doc_value  =
-        builder << bsoncxx::builder::stream::finalize;
-
-    //Aquire RO copy
-    bsoncxx::document::view view = doc_value.view();
+    auto docValue = builder.finalize();
 
     //Place packet into collection
     bsoncxx::stdx::optional<mongocxx::result::insert_one> result 
-        = coll.insert_one(view);
+        = coll.insert_one(docValue);
 
     return true;
 }

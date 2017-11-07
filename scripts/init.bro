@@ -1,5 +1,5 @@
 module LogMongo;
 
 export {
-    const debug = T &redef;
+    const debug = F &redef;
 }

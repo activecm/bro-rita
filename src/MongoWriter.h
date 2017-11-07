@@ -35,7 +35,7 @@ namespace logging {
             bool DoHeartbeat(double network_time, double current_time) override;
 
         private:
-            const std::unique_ptr<const threading::formatter::Ascii> formatter;
+            const threading::formatter::Ascii *const formatter;
         };
 
     }
