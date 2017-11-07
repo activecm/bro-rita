@@ -10,7 +10,6 @@ namespace plugin {
         class DocBuilder {
         public:
             explicit DocBuilder(const threading::formatter::Ascii *const formatter);
-
             void addField(const threading::Field * const field, const threading::Value * const value );
             bsoncxx::document::view finalize();
         private:

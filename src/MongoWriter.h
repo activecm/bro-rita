@@ -3,19 +3,21 @@
 
 #include <logging/WriterBackend.h>
 #include <threading/formatters/Ascii.h>
+#include <mongocxx/client.hpp>
 #include "MongoDBWriter.bif.h"
-#include <memory>
 
-namespace logging {
-    namespace writer {
+namespace plugin {
+    namespace OCMDev_MongoDBWriter {
 
-        class MongoDB : public WriterBackend {
+        class MongoWriter : public logging::WriterBackend {
 
         public:
-            explicit MongoDB(WriterFrontend *frontend);
+            explicit MongoWriter(logging::WriterFrontend *frontend);
 
-            static WriterBackend *Instantiate(WriterFrontend *frontend) {
-                return new MongoDB(frontend);
+            ~MongoWriter() override;
+
+            static logging::WriterBackend *Instantiate(logging::WriterFrontend *frontend) {
+                return new MongoWriter(frontend);
             }
 
         protected:
@@ -36,6 +38,9 @@ namespace logging {
 
         private:
             const threading::formatter::Ascii *const formatter;
+            const mongocxx::client * client;
+            string selectedDB;
+            string logCollection;
         };
 
     }

@@ -1,7 +1,6 @@
 #include "DocBuilder.h"
 #include <bsoncxx/builder/stream/array.hpp>
 
-
 using namespace plugin::OCMDev_MongoDBWriter;
 
 void DocBuilder::addField(const threading::Field *const field, const threading::Value *const value) {
@@ -20,6 +19,7 @@ void DocBuilder::addField(const threading::Field *const field, const threading::
             case TYPE_COUNT:
             case TYPE_COUNTER:
                 //THIS IS LARGE PROBLEM FIX
+                //TODO: Inspect RITA
                 builder << tag << bsoncxx::types::b_int64{(int64)value->val.uint_val};
                 break;
             case TYPE_DOUBLE:
