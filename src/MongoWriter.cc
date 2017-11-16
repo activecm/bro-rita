@@ -19,9 +19,9 @@ using namespace formatter;
 
 MongoWriter::MongoWriter(WriterFrontend *frontend) :
     WriterBackend(frontend),
-    formatter(new formatter::Ascii(
-                this, formatter::Ascii::SeparatorInfo()
-                )) {}
+    formatter(new formatter::Ascii(this, formatter::Ascii::SeparatorInfo())) {
+        this->buffer.reserve(this->BUFFER_SIZE);
+    }
 
     bool MongoWriter::DoInit(const WriterInfo &info, int num_fields,
             const Field *const *fields) {
@@ -31,6 +31,7 @@ MongoWriter::MongoWriter(WriterFrontend *frontend) :
         //TODO: grab selectedDB from the info config
         this->selectedDB = "mydb";
         this->logCollection = info.path;
+        this->insertOptions.ordered(false);
 
         if (BifConst::LogMongo::debug) {
             std::cout << "[logging::writer::MongoDB]" << std::endl;
@@ -69,13 +70,13 @@ bool MongoWriter::DoWrite(int num_fields, const Field *const *fields, Value **va
         builder.addField(fields[i], vals[i]);
     }
 
-    // End packet
-    auto docValue = builder.finalize();
+    if (this->buffer.size() == this->BUFFER_SIZE) {
+        bsoncxx::stdx::optional<mongocxx::result::insert_many> result =
+                coll.insert_many(this->buffer, this->insertOptions);
+        this->buffer.clear();
+    }
 
-    //Place packet into collection
-    bsoncxx::stdx::optional<mongocxx::result::insert_one> result 
-        = coll.insert_one(docValue);
-
+    this->buffer.push_back(builder.finalize());
     return true;
 }
 
@@ -93,10 +94,17 @@ bool MongoWriter::DoRotate(const char *rotated_path, double open, double close, 
 }
 
 bool MongoWriter::DoFlush(double network_time) {
+    //guaranteed bufferIdx > 0
+    mongocxx::collection coll = (*this->client)[this->selectedDB][this->logCollection];
+
+    bsoncxx::stdx::optional<mongocxx::result::insert_many> result =
+            coll.insert_many(this->buffer, this->insertOptions);
+    this->buffer.clear();
     return true;
 }
 
 bool MongoWriter::DoFinish(double network_time) {
+    DoFlush(network_time);
     return true;
 }
 

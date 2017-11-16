@@ -93,7 +93,9 @@ void DocBuilder::addField(const threading::Field *const field, const threading::
 DocBuilder::DocBuilder(const threading::formatter::Ascii *const formatter) : formatter(formatter) {
 }
 
-bsoncxx::document::view DocBuilder::finalize() {
-    return builder;
+bsoncxx::document::value DocBuilder::finalize() {
+    return builder.extract();
 }
+
+
 

@@ -11,7 +11,7 @@ namespace plugin {
         public:
             explicit DocBuilder(const threading::formatter::Ascii *const formatter);
             void addField(const threading::Field * const field, const threading::Value * const value );
-            bsoncxx::document::view finalize();
+            bsoncxx::document::value finalize();
         private:
             bsoncxx::builder::stream::document builder;
             const threading::formatter::Ascii *const formatter;
