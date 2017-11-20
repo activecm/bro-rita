@@ -63,11 +63,26 @@ MongoWriter::MongoWriter(WriterFrontend *frontend) :
 
 bool MongoWriter::DoWrite(int num_fields, const Field *const *fields, Value **vals) {
     mongocxx::collection coll = (*this->client)[this->selectedDB][this->logCollection];
+
+    /*
+    auto builder = bsoncxx::builder::stream::document{};
+    auto arr = bsoncxx::builder::stream::array{};
+
+    arr << "herp" << "derp";
+
+    builder << "key" << arr;
+
+    bsoncxx::document::value doc_value = builder << bsoncxx::builder::stream::finalize;
+    bsoncxx::document::view view = doc_value.view();
+    bsoncxx::stdx::optional<mongocxx::result::insert_one> result =
+        coll.insert_one(view);
+        */
     auto builder = plugin::OCMDev_MongoDBWriter::DocBuilder(this->formatter);
 
     for (int i = 0; i < num_fields; i++) {
         builder.addField(fields[i], vals[i]);
     }
+
 
     // End packet
     auto docValue = builder.finalize();

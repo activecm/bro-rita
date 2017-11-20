@@ -36,6 +36,7 @@ namespace plugin {
 
             bool DoHeartbeat(double network_time, double current_time) override;
 
+
         private:
             const threading::formatter::Ascii *const formatter;
             const mongocxx::client * client;
