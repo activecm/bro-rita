@@ -1,0 +1,6 @@
+[package]
+description = A MongoDB writer for Bro.
+tags = bro plugin, MongoDB, writer, security, conn, logging
+build_command = (./configure --bro-dist=%(bro_dist) && make)
+version = master
+depends = mongodb >= 3.4
