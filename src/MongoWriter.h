@@ -4,6 +4,7 @@
 #include <logging/WriterBackend.h>
 #include <threading/formatters/Ascii.h>
 #include <mongocxx/client.hpp>
+#include <array>
 #include "MongoDBWriter.bif.h"
 
 namespace plugin {
@@ -42,6 +43,10 @@ namespace plugin {
             const mongocxx::client * client;
             string selectedDB;
             string logCollection;
+
+            static const unsigned long BUFFER_SIZE = 100;
+            std::vector<bsoncxx::document::value> buffer;
+            mongocxx::options::insert insertOptions;
         };
 
     }

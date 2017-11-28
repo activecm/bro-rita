@@ -177,7 +177,9 @@ void DocBuilder::addArrayField(bsoncxx::builder::stream::array & arr, const thre
 DocBuilder::DocBuilder(const threading::formatter::Ascii *const formatter) : formatter(formatter) {
 }
 
-bsoncxx::document::view DocBuilder::finalize() {
-    return builder;
+bsoncxx::document::value DocBuilder::finalize() {
+    return builder.extract();
 }
+
+
 
