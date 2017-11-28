@@ -100,7 +100,9 @@ void MongoWriter::CreateMetaEntry() {
         << "version" << std::string("v") + std::to_string(PLUGIN_MAJOR) + "." + std::to_string(PLUGIN_MINOR) + "-" + PLUGIN_NAME
         << bsoncxx::builder::stream::finalize;
 
+    try{
     coll.insert_one( doc_value.view() );
+    }catch (...){/*TODO:REMOVE HACK only catch duplicate key error*/}
 
     shouldCreateMetaDB = false;
 }
