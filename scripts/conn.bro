@@ -8,4 +8,6 @@ event bro_init()
     ];
     
     Log::add_filter(Conn::LOG, filter);
+
+    print Log::set_buf(Conn::LOG, F);
 }

@@ -47,6 +47,8 @@ namespace plugin {
             static const unsigned long BUFFER_SIZE = 100;
             std::vector<bsoncxx::document::value> buffer;
             mongocxx::options::insert insertOptions;
+
+            bsoncxx::stdx::optional<mongocxx::result::insert_many> flushHelper();
         };
 
     }

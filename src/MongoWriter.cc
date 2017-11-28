@@ -63,38 +63,40 @@ MongoWriter::MongoWriter(WriterFrontend *frontend) :
     }
 
 bool MongoWriter::DoWrite(int num_fields, const Field *const *fields, Value **vals) {
-    mongocxx::collection coll = (*this->client)[this->selectedDB][this->logCollection];
-
-    /*
-    auto builder = bsoncxx::builder::stream::document{};
-    auto arr = bsoncxx::builder::stream::array{};
-
-    arr << "herp" << "derp";
-
-    builder << "key" << arr;
-
-    bsoncxx::document::value doc_value = builder << bsoncxx::builder::stream::finalize;
-    bsoncxx::document::view view = doc_value.view();
-    bsoncxx::stdx::optional<mongocxx::result::insert_one> result =
-        coll.insert_one(view);
-        */
     auto builder = plugin::OCMDev_MongoDBWriter::DocBuilder(this->formatter);
 
     for (int i = 0; i < num_fields; i++) {
         builder.addField(fields[i], vals[i]);
     }
 
-    if (this->buffer.size() == this->BUFFER_SIZE) {
-        bsoncxx::stdx::optional<mongocxx::result::insert_many> result =
-                coll.insert_many(this->buffer, this->insertOptions);
-        this->buffer.clear();
-    }
+    if (this->IsBuf()) {
+        std::cout << "Buffered" << endl;
+        bool result = true;
+        if (this->buffer.size() == this->BUFFER_SIZE) {
+            result = (bool)this->flushHelper();
+        }
 
-    this->buffer.push_back(builder.finalize());
-    return true;
+        this->buffer.push_back(builder.finalize());
+        return result;
+    } else {
+        std::cout << "Unbuffered" << std::endl;
+        mongocxx::collection coll = (*this->client)[this->selectedDB][this->logCollection];
+        auto result = coll.insert_one(builder.finalize());
+        return (bool)result;
+    }
 }
 
 bool MongoWriter::DoSetBuf(bool enabled) {
+    //this method will only be called if enabled is different
+    //from the previous state
+    std::cout << "DoSetBuf called" << std::endl;
+
+    //unbuffered -> buffered: do nothing
+
+    //buffered -> unbuffered
+    if (!enabled && !this->buffer.empty()) {
+        this->flushHelper();
+    }
     return true;
 }
 
@@ -103,22 +105,22 @@ bool MongoWriter::DoRotate(const char *rotated_path, double open, double close, 
         Error(Fmt("error rotating %s", Info().path));
         return false;
     }
-
     return true;
 }
 
 bool MongoWriter::DoFlush(double network_time) {
-    //guaranteed bufferIdx > 0
-    mongocxx::collection coll = (*this->client)[this->selectedDB][this->logCollection];
-
-    bsoncxx::stdx::optional<mongocxx::result::insert_many> result =
-            coll.insert_many(this->buffer, this->insertOptions);
-    this->buffer.clear();
+    if (!this->buffer.empty()) {
+        auto result = this->flushHelper();
+        return (bool)result;
+    }
     return true;
 }
 
 bool MongoWriter::DoFinish(double network_time) {
-    DoFlush(network_time);
+    if (!this->buffer.empty()) {
+        auto result = this->flushHelper();
+        return (bool)result;
+    }
     return true;
 }
 
@@ -129,4 +131,13 @@ bool MongoWriter::DoHeartbeat(double network_time, double current_time) {
 MongoWriter::~MongoWriter() {
     delete this->formatter;
     delete this->client;
+}
+
+bsoncxx::stdx::optional<mongocxx::result::insert_many> MongoWriter::flushHelper() {
+    auto coll = (*this->client)[this->selectedDB][this->logCollection];
+    auto result = coll.insert_many(this->buffer, this->insertOptions);
+    if (result) {
+        this->buffer.clear();
+    }
+    return result;
 }
