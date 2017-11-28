@@ -6,7 +6,8 @@ event bro_init()
         $path="conn",
         $config=table(
                 ["uri"] = "mongodb://localhost:27017",
-                ["selectedDB"]="mydb"
+                ["selectedDB"]="mydb",
+                ["rotate"]="true"
                 ##["authentication"]="",
                 ##["tls"]="",
                 ##["verifyCert"]="false"

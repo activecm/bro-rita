@@ -41,20 +41,23 @@ namespace plugin {
             bool DoFinish(double network_time) override;
 
             bool DoHeartbeat(double network_time, double current_time) override;
-            bool SetConfig( const WriterInfo& info);
-            string LookupParam(const WriterInfo& info, const string name) const;
-            bool CreateMetaEntry();
 
 
         private:
             const threading::formatter::Ascii *const formatter;
             const mongocxx::client * client;
-            string selectedDB;
-            string logCollection;
+            std::string selectedDBBase;
+            std::string selectedDB;
+            std::string logCollection;
+            bool shouldRotate;
 
             static const unsigned long BUFFER_SIZE = 1000;
             std::vector<bsoncxx::document::value> buffer;
             mongocxx::options::insert insertOptions;
+
+            bool SetConfig( const WriterInfo& info);
+            std::string LookupParam(const WriterInfo& info, const std::string name) const;
+            void RotateDBName();
         };
 
     }
