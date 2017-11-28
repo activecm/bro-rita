@@ -36,6 +36,8 @@ namespace plugin {
             bool DoFinish(double network_time) override;
 
             bool DoHeartbeat(double network_time, double current_time) override;
+            bool SetConfig( const WriterInfo& info);
+            string LookupParam(const WriterInfo& info, const string name) const;
 
 
         private:

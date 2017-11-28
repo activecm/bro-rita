@@ -26,29 +26,16 @@ MongoWriter::MongoWriter(WriterFrontend *frontend) :
     bool MongoWriter::DoInit(const WriterInfo &info, int num_fields,
             const Field *const *fields) {
 
-        mongocxx::uri uri("mongodb://localhost:27017");
-        this->client = new mongocxx::client(uri);
-        //TODO: grab selectedDB from the info config
-        this->selectedDB = "mydb";
-        this->logCollection = info.path;
-        this->insertOptions.ordered(false);
-
         if (BifConst::LogMongo::debug) {
             std::cout << "[logging::writer::MongoDB]" << std::endl;
             std::cout << "  path=" << info.path << std::endl;
             std::cout << "  rotation_interval=" << info.rotation_interval << std::endl;
             std::cout << "  rotation_base=" << info.rotation_base << std::endl;
 
-            // Output the config sorted by key.
-            std::vector<std::pair<string, string> > configList;
-
             for (const auto &i : info.config)
-                configList.emplace_back(i.first, i.second);
-
-            std::sort(configList.begin(), configList.end());
-
-            for (auto &configItem : configList)
-                std::cout << "  config[" << configItem.first << "] = " << configItem.second << std::endl;
+            {
+                std::cout << "  config[" << i.first << "] = " << i.second << std::endl;
+            }
 
             for (int i = 0; i < num_fields; i++) {
                 const Field *field = fields[i];
@@ -58,26 +45,52 @@ MongoWriter::MongoWriter(WriterFrontend *frontend) :
 
             std::cout << std::endl;
         }
+
+        this->logCollection = info.path;
+        this->insertOptions.ordered(false);
+
+        if ( !SetConfig( info ) )
+        {
+            return false;
+        }
+
         mongocxx::instance instance{};
         return true;
     }
 
+bool MongoWriter::SetConfig( const WriterInfo& info )
+{
+    string uriInfo = LookupParam( info, "uri");
+    if( !uriInfo.empty() ){
+        mongocxx::uri uri( uriInfo );
+        this->client = new mongocxx::client(uri);
+    }
+    else{
+        return false;
+    }
+
+    string dbInfo = LookupParam( info, "selectedDB");
+    if( !uriInfo.empty() ){
+        selectedDB = dbInfo;
+    }
+    else{
+        return false;
+    }
+    return true;
+}
+
+string MongoWriter::LookupParam(const WriterInfo& info, const string name) const
+{
+    map<const char*, const char*>::const_iterator it = info.config.find(name.c_str());
+    if ( it == info.config.end() )
+        return string();
+    else
+        return it->second;
+}
+
 bool MongoWriter::DoWrite(int num_fields, const Field *const *fields, Value **vals) {
     mongocxx::collection coll = (*this->client)[this->selectedDB][this->logCollection];
 
-    /*
-    auto builder = bsoncxx::builder::stream::document{};
-    auto arr = bsoncxx::builder::stream::array{};
-
-    arr << "herp" << "derp";
-
-    builder << "key" << arr;
-
-    bsoncxx::document::value doc_value = builder << bsoncxx::builder::stream::finalize;
-    bsoncxx::document::view view = doc_value.view();
-    bsoncxx::stdx::optional<mongocxx::result::insert_one> result =
-        coll.insert_one(view);
-        */
     auto builder = plugin::OCMDev_MongoDBWriter::DocBuilder(this->formatter);
 
     for (int i = 0; i < num_fields; i++) {
@@ -86,7 +99,7 @@ bool MongoWriter::DoWrite(int num_fields, const Field *const *fields, Value **va
 
     if (this->buffer.size() == this->BUFFER_SIZE) {
         bsoncxx::stdx::optional<mongocxx::result::insert_many> result =
-                coll.insert_many(this->buffer, this->insertOptions);
+            coll.insert_many(this->buffer, this->insertOptions);
         this->buffer.clear();
     }
 
@@ -112,7 +125,7 @@ bool MongoWriter::DoFlush(double network_time) {
     mongocxx::collection coll = (*this->client)[this->selectedDB][this->logCollection];
 
     bsoncxx::stdx::optional<mongocxx::result::insert_many> result =
-            coll.insert_many(this->buffer, this->insertOptions);
+        coll.insert_many(this->buffer, this->insertOptions);
     this->buffer.clear();
     return true;
 }

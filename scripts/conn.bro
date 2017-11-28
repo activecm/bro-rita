@@ -4,8 +4,15 @@ event bro_init()
     [
         $name="MongoDB",
         $path="conn",
+        $config=table(
+                ["uri"] = "mongodb://localhost:27017",
+                ["selectedDB"]="mydb"
+                ##["authentication"]="",
+                ##["tls"]="",
+                ##["verifyCert"]="false"
+                ),
         $writer=Log::WRITER_MONGODB
     ];
-    
+
     Log::add_filter(Conn::LOG, filter);
 }
