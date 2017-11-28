@@ -48,6 +48,7 @@ MongoWriter::MongoWriter(WriterFrontend *frontend) :
 
         this->logCollection = info.path;
         this->insertOptions.ordered(false);
+        this->shouldCreateMetaDB = true;
 
         if ( !SetConfig( info ) )
         {
@@ -88,7 +89,28 @@ string MongoWriter::LookupParam(const WriterInfo& info, const string name) const
         return it->second;
 }
 
+
+void MongoWriter::CreateMetaEntry() {
+    mongocxx::collection coll = (*this->client)["MetaDatabase"]["databases"];
+    auto builder = bsoncxx::builder::stream::document{};
+    bsoncxx::document::value doc_value = builder
+        << "name" << this->selectedDB
+        << "analyzed" << false
+        << "dates" << false
+        << "version" << std::string("v") + std::to_string(PLUGIN_MAJOR) + "." + std::to_string(PLUGIN_MINOR) + "-" + PLUGIN_NAME
+        << bsoncxx::builder::stream::finalize;
+
+    coll.insert_one( doc_value.view() );
+
+    shouldCreateMetaDB = false;
+}
+
 bool MongoWriter::DoWrite(int num_fields, const Field *const *fields, Value **vals) {
+    if( shouldCreateMetaDB )
+    {
+        CreateMetaEntry();
+    }
+
     mongocxx::collection coll = (*this->client)[this->selectedDB][this->logCollection];
 
     auto builder = plugin::OCMDev_MongoDBWriter::DocBuilder(this->formatter);

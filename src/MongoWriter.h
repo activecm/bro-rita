@@ -10,6 +10,10 @@
 namespace plugin {
     namespace OCMDev_MongoDBWriter {
 
+    const static int PLUGIN_MAJOR = 0;
+    const static int PLUGIN_MINOR = 1;
+    const static std::string PLUGIN_NAME = "OCMDev::MongoDBWriter";
+
         class MongoWriter : public logging::WriterBackend {
 
         public:
@@ -38,6 +42,7 @@ namespace plugin {
             bool DoHeartbeat(double network_time, double current_time) override;
             bool SetConfig( const WriterInfo& info);
             string LookupParam(const WriterInfo& info, const string name) const;
+            void CreateMetaEntry();
 
 
         private:
@@ -45,6 +50,7 @@ namespace plugin {
             const mongocxx::client * client;
             string selectedDB;
             string logCollection;
+            bool shouldCreateMetaDB;
 
             static const unsigned long BUFFER_SIZE = 100;
             std::vector<bsoncxx::document::value> buffer;
