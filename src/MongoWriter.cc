@@ -1,6 +1,6 @@
 #include "MongoWriter.h"
 #include "DocBuilder.h"
-#include <mongocxx/instance.hpp>
+#include <mongocxx/exception/bulk_write_exception.hpp>
 
 using bsoncxx::builder::stream::close_array;
 using bsoncxx::builder::stream::close_document;
@@ -48,14 +48,19 @@ MongoWriter::MongoWriter(WriterFrontend *frontend) :
 
         this->logCollection = info.path;
         this->insertOptions.ordered(false);
-        this->shouldCreateMetaDB = true;
+
+        mongocxx::instance& instance = mongocxx::instance::current();
 
         if ( !SetConfig( info ) )
         {
             return false;
         }
 
-        mongocxx::instance instance{};
+        if (!CreateMetaEntry()) {
+            //TODO: report error
+            return false;
+        }
+
         return true;
     }
 
@@ -77,12 +82,13 @@ bool MongoWriter::SetConfig( const WriterInfo& info )
     else{
         return false;
     }
+
     return true;
 }
 
 string MongoWriter::LookupParam(const WriterInfo& info, const string name) const
 {
-    map<const char*, const char*>::const_iterator it = info.config.find(name.c_str());
+    auto it = info.config.find(name.c_str());
     if ( it == info.config.end() )
         return string();
     else
@@ -90,29 +96,38 @@ string MongoWriter::LookupParam(const WriterInfo& info, const string name) const
 }
 
 
-void MongoWriter::CreateMetaEntry() {
+bool MongoWriter::CreateMetaEntry() {
     mongocxx::collection coll = (*this->client)["MetaDatabase"]["databases"];
+
+    // new MetaDB entry
     auto builder = bsoncxx::builder::stream::document{};
-    bsoncxx::document::value doc_value = builder
+    bsoncxx::document::value docValue = builder
         << "name" << this->selectedDB
-        << "analyzed" << false
-        << "dates" << false
+        << "analyzed" << bsoncxx::types::b_bool{false}
+        << "dates" << bsoncxx::types::b_bool{false}
         << "version" << std::string("v") + std::to_string(PLUGIN_MAJOR) + "." + std::to_string(PLUGIN_MINOR) + "-" + PLUGIN_NAME
         << bsoncxx::builder::stream::finalize;
 
-    try{
-    coll.insert_one( doc_value.view() );
-    }catch (...){/*TODO:REMOVE HACK only catch duplicate key error*/}
+    try {
+        //assume this is a new database
+        coll.insert_one( docValue.view() );
+    } catch (const mongocxx::bulk_write_exception& ){
 
-    shouldCreateMetaDB = false;
+        //check if the database has already been analyzed
+        auto queryBuilder = bsoncxx::builder::stream::document{};
+        bsoncxx::document::value queryValue = queryBuilder << "name" << this->selectedDB << bsoncxx::builder::stream::finalize;
+        auto metaDBDoc = coll.find_one(queryValue.view());
+
+        if (!metaDBDoc || metaDBDoc.value().view()["analyzed"].get_bool()) {
+            //if we couldn't query for the existing record, or the db is already analyzed, error out
+            return false;
+        }
+    }
+
+    return true;
 }
 
 bool MongoWriter::DoWrite(int num_fields, const Field *const *fields, Value **vals) {
-    if( shouldCreateMetaDB )
-    {
-        CreateMetaEntry();
-    }
-
     mongocxx::collection coll = (*this->client)[this->selectedDB][this->logCollection];
 
     auto builder = plugin::OCMDev_MongoDBWriter::DocBuilder(this->formatter);

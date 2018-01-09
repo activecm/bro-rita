@@ -5,6 +5,7 @@
 #include <threading/formatters/Ascii.h>
 #include <mongocxx/client.hpp>
 #include <array>
+#include <mongocxx/instance.hpp>
 #include "MongoDBWriter.bif.h"
 
 namespace plugin {
@@ -42,7 +43,7 @@ namespace plugin {
             bool DoHeartbeat(double network_time, double current_time) override;
             bool SetConfig( const WriterInfo& info);
             string LookupParam(const WriterInfo& info, const string name) const;
-            void CreateMetaEntry();
+            bool CreateMetaEntry();
 
 
         private:
@@ -50,9 +51,8 @@ namespace plugin {
             const mongocxx::client * client;
             string selectedDB;
             string logCollection;
-            bool shouldCreateMetaDB;
 
-            static const unsigned long BUFFER_SIZE = 100;
+            static const unsigned long BUFFER_SIZE = 1000;
             std::vector<bsoncxx::document::value> buffer;
             mongocxx::options::insert insertOptions;
         };
