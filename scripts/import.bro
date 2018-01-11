@@ -3,7 +3,8 @@ event bro_init()
 
     local mongoConfig: table[string] of string = table(
         ["uri"] = "mongodb://localhost:27017",
-        ["selectedDB"]="DEMO-PLUGIN_IMPORT"
+        ["selectedDB"]="DEMO-PLUGIN_IMPORT_DATES",
+        ["rotate"]="true"
     );
 
     local connFilter: Log::Filter =

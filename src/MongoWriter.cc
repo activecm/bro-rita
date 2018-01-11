@@ -26,6 +26,8 @@ MongoWriter::MongoWriter(WriterFrontend *frontend) :
     this->shouldRotate = false;
 }
 
+//TODO: Add the ability to split logs out by day in the write process.
+
 bool MongoWriter::DoInit(const WriterInfo &info, int num_fields,
                          const Field *const *fields) {
 
@@ -47,6 +49,9 @@ bool MongoWriter::DoInit(const WriterInfo &info, int num_fields,
 
         std::cout << std::endl;
     }
+
+    this->logCollection = info.path;
+    this->insertOptions.ordered(false);
 
     mongocxx::instance& instance = mongocxx::instance::current();
 
@@ -79,17 +84,13 @@ bool MongoWriter::SetConfig(const WriterInfo &info) {
     }
 
     std::string dbInfo = LookupParam(info, "selectedDB");
-    if (!uriInfo.empty()) {
-        this->selectedDBBase = dbInfo;
-        if (this->shouldRotate) {
-            this->RotateDBName();
-        } else {
-            this->selectedDB = this->selectedDBBase;
-        }
-    } else {
-        return false;
-    }
+    this->selectedDBBase = dbInfo;
 
+    if (this->shouldRotate) {
+        this->RotateDBName();
+    } else {
+        this->selectedDB = this->selectedDBBase;
+    }
     return true;
 }
 
@@ -111,7 +112,7 @@ bool MongoWriter::CreateMetaEntry() {
     bsoncxx::document::value docValue = builder
         << "name" << this->selectedDB
         << "analyzed" << bsoncxx::types::b_bool{false}
-        << "dates" << bsoncxx::types::b_bool{false}
+        << "dates" << bsoncxx::types::b_bool{this->shouldRotate}
         << "version" << std::string("v") + std::to_string(PLUGIN_MAJOR) + "." + std::to_string(PLUGIN_MINOR) + "-" + PLUGIN_NAME
         << bsoncxx::builder::stream::finalize;
 
@@ -134,9 +135,18 @@ bool MongoWriter::CreateMetaEntry() {
     return true;
 }
 
-bool MongoWriter::DoWrite(int num_fields, const Field *const *fields, Value **vals) {
+bool MongoWriter::FlushBuffer() {
     mongocxx::collection coll = (*this->client)[this->selectedDB][this->logCollection];
+    bsoncxx::stdx::optional<mongocxx::result::insert_many> result =
+            coll.insert_many(this->buffer, this->insertOptions);
+    if (!result) {
+        return false;
+    }
+    this->buffer.clear();
+    return true;
+}
 
+bool MongoWriter::DoWrite(int num_fields, const Field *const *fields, Value **vals) {
     auto builder = plugin::OCMDev_MongoDBWriter::DocBuilder(this->formatter);
 
     for (int i = 0; i < num_fields; i++) {
@@ -144,9 +154,9 @@ bool MongoWriter::DoWrite(int num_fields, const Field *const *fields, Value **va
     }
 
     if (this->buffer.size() == this->BUFFER_SIZE) {
-        bsoncxx::stdx::optional<mongocxx::result::insert_many> result =
-                coll.insert_many(this->buffer, this->insertOptions);
-        this->buffer.clear();
+        if (!this->FlushBuffer()) {
+            return false;
+        }
     }
 
     this->buffer.push_back(builder.finalize());
@@ -161,7 +171,9 @@ bool MongoWriter::DoSetBuf(bool enabled) {
 bool MongoWriter::DoRotate(const char *rotated_path, double open, double close, bool terminating) {
     if (this->shouldRotate) {
         //buffer guaranteed to have an item
-        this->DoFlush(0); //TODO: move DoFlush to helper
+        if (!this->FlushBuffer()) {
+            return false;
+        }
         this->RotateDBName();
     }
 
@@ -175,16 +187,12 @@ bool MongoWriter::DoRotate(const char *rotated_path, double open, double close, 
 
 bool MongoWriter::DoFlush(double network_time) {
     //guaranteed bufferIdx > 0
-    mongocxx::collection coll = (*this->client)[this->selectedDB][this->logCollection];
-
-    auto result = coll.insert_many(this->buffer, this->insertOptions);
-    this->buffer.clear();
-    return true;
+    return this->FlushBuffer();
 }
 
 bool MongoWriter::DoFinish(double network_time) {
-    DoFlush(network_time);
-    return true;
+    //guaranteed bufferIdx > 0
+    return this->FlushBuffer();
 }
 
 bool MongoWriter::DoHeartbeat(double network_time, double current_time) {
@@ -200,6 +208,6 @@ void MongoWriter::RotateDBName() {
     auto t = std::time(nullptr);
     auto tm = *std::localtime(&t);
     std::ostringstream oss;
-    oss << std::put_time(&tm, "-%Y-%m-%d");
-    this->selectedDB = this->selectedDBBase + oss.str();
+    oss << this->selectedDBBase << std::put_time(&tm, "-%Y-%m-%d");
+    this->selectedDB = oss.str();
 }

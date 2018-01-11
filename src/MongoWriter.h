@@ -56,8 +56,11 @@ namespace plugin {
             mongocxx::options::insert insertOptions;
 
             bool SetConfig( const WriterInfo& info);
+            bool CreateMetaEntry();
             std::string LookupParam(const WriterInfo& info, const std::string name) const;
             void RotateDBName();
+
+            bool FlushBuffer();
         };
 
     }
