@@ -10,9 +10,9 @@ namespace plugin {
     namespace OCMDev_MongoDBWriter {
         class DocBuilder {
         public:
-            explicit DocBuilder(const threading::formatter::Ascii *const formatter);
-            void addField(const threading::Field * const field, const threading::Value * const value );
-            void addArrayField( bsoncxx::builder::stream::array& arr, const threading::Value * const value );
+            explicit DocBuilder(const threading::formatter::Ascii *formatter);
+            void addField(const threading::Field *field, const threading::Value *value );
+            void addArrayField( bsoncxx::builder::stream::array& arr, const threading::Value *value );
             bsoncxx::document::value finalize();
 
         private:

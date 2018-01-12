@@ -7,23 +7,20 @@
 #include <array>
 #include <mongocxx/instance.hpp>
 #include "MongoDBWriter.bif.h"
+#include "writers/AbstractMongoDBWriter.h"
 
 namespace plugin {
     namespace OCMDev_MongoDBWriter {
 
-    const static int PLUGIN_MAJOR = 0;
-    const static int PLUGIN_MINOR = 1;
-    const static std::string PLUGIN_NAME = "OCMDev::MongoDBWriter";
-
-        class MongoWriter : public logging::WriterBackend {
+        class MongoDBWriterBackend : public logging::WriterBackend {
 
         public:
-            explicit MongoWriter(logging::WriterFrontend *frontend);
+            explicit MongoDBWriterBackend(logging::WriterFrontend *frontend);
 
-            ~MongoWriter() override;
+            ~MongoDBWriterBackend() override;
 
             static logging::WriterBackend *Instantiate(logging::WriterFrontend *frontend) {
-                return new MongoWriter(frontend);
+                return new MongoDBWriterBackend(frontend);
             }
 
         protected:
@@ -45,22 +42,10 @@ namespace plugin {
 
         private:
             const threading::formatter::Ascii *const formatter;
-            const mongocxx::client * client;
-            std::string selectedDBBase;
-            std::string selectedDB;
-            std::string logCollection;
-            bool shouldRotate;
+            shared_ptr<const mongocxx::client> client;
+            unique_ptr<AbstractMongoDBWriter> writer;
 
-            static const unsigned long BUFFER_SIZE = 1000;
-            std::vector<bsoncxx::document::value> buffer;
-            mongocxx::options::insert insertOptions;
-
-            bool SetConfig( const WriterInfo& info);
-            bool CreateMetaEntry();
-            std::string LookupParam(const WriterInfo& info, const std::string name) const;
-            void RotateDBName();
-
-            bool FlushBuffer();
+            std::string LookupParam(const WriterInfo& info, const std::string& name) const;
         };
 
     }
