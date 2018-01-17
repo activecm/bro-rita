@@ -16,6 +16,7 @@ bool DailyBufferedMongoDBWriter::Write(bsoncxx::document::value document) {
     int64_t day = static_cast<int64_t>(document.view()["ts"].get_double().value);
     day = day - (day % 86400);
     MongoDBBuffer* buffer = nullptr;
+
     auto bufferIt = this->buffers.find(day);
     if (bufferIt != this->buffers.end()) {
         buffer = &bufferIt->second;
@@ -25,7 +26,10 @@ bool DailyBufferedMongoDBWriter::Write(bsoncxx::document::value document) {
                 this->logCollection
         ));
         buffer = &this->buffers.at(day);
-        CreateMetaEntry(buffer->targetDB, buffer->targetCollection);
+        if (!(CreateMetaEntry(buffer->targetDB) &&
+              this->IndexLogCollection(buffer->targetDB, buffer->targetCollection))) {
+            return false;
+        }
     }
 
     if (buffer->Full() && !buffer->Flush(*this->client)) {

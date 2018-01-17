@@ -15,7 +15,8 @@ BufferedMongoDBWriter::BufferedMongoDBWriter(const std::shared_ptr<const mongocx
 }
 
 bool BufferedMongoDBWriter::Init() {
-    return this->CreateMetaEntry(this->buffer.targetDB, this->buffer.targetCollection);
+    return this->CreateMetaEntry(this->buffer.targetDB) &&
+            this->IndexLogCollection(this->buffer.targetDB, this->buffer.targetCollection);
 }
 
 bool BufferedMongoDBWriter::Write(bsoncxx::document::value document) {

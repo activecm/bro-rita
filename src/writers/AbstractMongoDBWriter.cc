@@ -3,6 +3,8 @@
 //
 
 #include <mongocxx/exception/bulk_write_exception.hpp>
+#include <bsoncxx/builder/basic/document.hpp>
+#include <iostream>
 #include "AbstractMongoDBWriter.h"
 #include "../Version.h"
 
@@ -23,34 +25,87 @@ bool AbstractMongoDBWriter::Rotate() {
 }
 
 
-bool AbstractMongoDBWriter::CreateMetaEntry(const std::string& targetDB, const std::string& targetCollection) {
+bool AbstractMongoDBWriter::CreateMetaEntry(const std::string &targetDB) {
+    using bsoncxx::builder::basic::kvp;
     mongocxx::collection coll = (*this->client)["MetaDatabase"]["databases"];
 
     // new MetaDB entry
-    auto builder = bsoncxx::builder::stream::document{};
-    bsoncxx::document::value docValue = builder
-            << "name" << targetDB
-            << "analyzed" << bsoncxx::types::b_bool{false}
-            << "dates" << bsoncxx::types::b_bool{false}
-            << "version" << std::string("v") + std::to_string(PLUGIN_MAJOR) + "." + std::to_string(PLUGIN_MINOR) + "-" + PLUGIN_NAME
-            << bsoncxx::builder::stream::finalize;
+    bsoncxx::builder::basic::document metaDBDoc;
+    metaDBDoc.append(kvp("name", targetDB));
+    metaDBDoc.append(kvp("analyzed", false));
+    metaDBDoc.append(kvp("dates", false));
+    metaDBDoc.append(kvp("version", std::string("v") +
+            std::to_string(PLUGIN_MAJOR) + "." +
+            std::to_string(PLUGIN_MINOR) + "-" + PLUGIN_NAME));
 
     try {
         //assume this is a new database
-        coll.insert_one( docValue.view() );
+        coll.insert_one( metaDBDoc.view() );
     } catch (const mongocxx::bulk_write_exception& ){
 
         //check if the database has already been analyzed
-        auto queryBuilder = bsoncxx::builder::stream::document{};
-        bsoncxx::document::value queryValue = queryBuilder
-                << "name" << targetDB
-                << bsoncxx::builder::stream::finalize;
-        auto metaDBDoc = coll.find_one(queryValue.view());
+        bsoncxx::builder::basic::document query;
+        query.append(kvp("name", targetDB));
+        auto existingDoc = coll.find_one(query.view());
 
-        if (!metaDBDoc || metaDBDoc.value().view()["analyzed"].get_bool()) {
+        if (!existingDoc || existingDoc.value().view()["analyzed"].get_bool()) {
             //if we couldn't query for the existing record, or the db is already analyzed, error out
             return false;
         }
+    }
+
+    return true;
+}
+
+bool AbstractMongoDBWriter::IndexLogCollection(const std::string &targetDB, const std::string &targetCollection) {
+    mongocxx::collection coll = (*this->client)[targetDB][targetCollection];
+
+    std::vector<bsoncxx::document::value> indexes;
+    using bsoncxx::builder::basic::kvp;
+
+    if (targetCollection == "conn") {
+        bsoncxx::builder::basic::document tsIndex;
+        tsIndex.append(kvp("ts", 1));
+        indexes.push_back(tsIndex.extract());
+
+        bsoncxx::builder::basic::document durationIndex;
+        durationIndex.append(kvp("duration", -1));
+        indexes.push_back(durationIndex.extract());
+
+        bsoncxx::builder::basic::document uidIndex;
+        uidIndex.append(kvp("uid", "hashed"));
+        indexes.push_back(uidIndex.extract());
+
+    } else if (targetCollection == "http") {
+
+        bsoncxx::builder::basic::document userAgentIndex;
+        userAgentIndex.append(kvp("user_agent", "hashed"));
+        indexes.push_back(userAgentIndex.extract());
+
+        bsoncxx::builder::basic::document uidIndex;
+        uidIndex.append(kvp("uid", "hashed"));
+        indexes.push_back(uidIndex.extract());
+
+    } else if (targetCollection == "dns") {
+        bsoncxx::builder::basic::document queryIndex;
+        queryIndex.append(kvp("query", "hashed"));
+        indexes.push_back(queryIndex.extract());
+
+    } else {
+        return false;
+    }
+
+    bsoncxx::builder::basic::document origIndex;
+    origIndex.append(kvp("id_orig_h", "hashed"));
+    indexes.push_back(origIndex.extract());
+
+    bsoncxx::builder::basic::document respIndex;
+    respIndex.append(kvp("id_resp_h", "hashed"));
+    indexes.push_back(respIndex.extract());
+
+    for (auto& index: indexes) {
+        //TODO: Figure out how to error check this
+        coll.create_index(std::move(index));
     }
 
     return true;
