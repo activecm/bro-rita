@@ -8,9 +8,10 @@ event bro_init()
                 ["uri"] = "mongodb://localhost:27017",
                 ["selectedDB"]="mydb",
                 ["rotate"]="true"
-                ##["authentication"]="",
-                ##["tls"]="",
-                ##["verifyCert"]="false"
+                #["x509ClientCert"]="",
+                #["CAFile"]="",
+                #["verifyCert"]="true",
+                ["selectedDB"]="mydb"
                 ),
         $writer=Log::WRITER_MONGODB
     ];

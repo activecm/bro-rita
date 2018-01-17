@@ -53,11 +53,45 @@ bool MongoDBWriterBackend::DoInit(const WriterInfo &info, int num_fields,
         std::cout << std::endl;
     }
 
+    mongocxx::options::client client_opts{};
+    mongocxx::options::ssl ssl_opts{};
+
+    string CAFile = LookupParam( info, "CAFile");
+    if( !CAFile.empty() ){
+       if( access( CAFile.c_str(), F_OK ) == 0 ){
+          ssl_opts.ca_file( CAFile );
+          ssl_opts.allow_invalid_certificates( false );
+       }
+       else {
+          return false;
+       }
+    }
+
+    string verifyCert = LookupParam( info, "verifyCert");
+    if( !verifyCert.empty() ){
+       if( verifyCert == "false" ){
+          ssl_opts.allow_invalid_certificates( true );
+       }
+    }
+
+    string pemFile = LookupParam( info, "x509ClientCert");
+    if( !pemFile.empty() ){
+       if( access( pemFile.c_str(), F_OK ) == 0 ){
+          ssl_opts.pem_file( pemFile );
+          ssl_opts.allow_invalid_certificates( false );
+       }
+       else {
+         return false;
+       }
+    }
+
+    client_opts.ssl_opts( ssl_opts );
+
     std::string uriInfo = LookupParam(info, "uri");
     if (uriInfo.empty()) {
         return false;
     }
-    mongocxx::uri uri(uriInfo);
+    mongocxx::uri uri(uriInfo, client_opts);
 
     std::string selectedDB = LookupParam(info, "selectedDB");
     if (selectedDB.empty()) {
@@ -87,7 +121,6 @@ bool MongoDBWriterBackend::DoInit(const WriterInfo &info, int num_fields,
     return this->writer->Init();
 
 }
-
 
 std::string MongoDBWriterBackend::LookupParam(const WriterInfo &info, const std::string& name) const {
     auto it = info.config.find(name.c_str());
