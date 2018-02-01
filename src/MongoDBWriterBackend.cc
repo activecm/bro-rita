@@ -91,7 +91,8 @@ bool MongoDBWriterBackend::DoInit(const WriterInfo &info, int num_fields,
     if (uriInfo.empty()) {
         return false;
     }
-    mongocxx::uri uri(uriInfo, client_opts);
+
+    mongocxx::uri uri(uriInfo);
 
     std::string selectedDB = LookupParam(info, "selectedDB");
     if (selectedDB.empty()) {
@@ -102,7 +103,7 @@ bool MongoDBWriterBackend::DoInit(const WriterInfo &info, int num_fields,
 
 
     mongocxx::instance& instance = mongocxx::instance::current();
-    this->client = make_shared<const mongocxx::client>(uri);
+    this->client = make_shared<const mongocxx::client>(uri, client_opts);
 
     std::string rotate = LookupParam(info, "rotate");
     std::transform(rotate.begin(), rotate.end(), rotate.begin(), ::tolower);
