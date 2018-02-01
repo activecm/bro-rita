@@ -34,7 +34,8 @@ bool AbstractMongoDBWriter::CreateMetaEntry(const std::string &targetDB) {
     metaDBDoc.append(kvp("name", targetDB));
     metaDBDoc.append(kvp("analyzed", false));
     metaDBDoc.append(kvp("dates", false));
-    metaDBDoc.append(kvp("version", std::string("v") +
+    metaDBDoc.append(kvp("analyze_version", std::string("")));
+    metaDBDoc.append(kvp("import_version", std::string("v") +
             std::to_string(PLUGIN_MAJOR) + "." +
             std::to_string(PLUGIN_MINOR) + "-" + PLUGIN_NAME));
 
