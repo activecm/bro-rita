@@ -6,7 +6,6 @@
 #include <mongocxx/client.hpp>
 #include <array>
 #include <mongocxx/instance.hpp>
-#include "MongoDBWriter.bif.h"
 #include "writers/AbstractMongoDBWriter.h"
 
 namespace plugin {

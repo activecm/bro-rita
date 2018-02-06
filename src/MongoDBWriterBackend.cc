@@ -1,8 +1,9 @@
-#include "MongoDBWriterBackend.h"
-#include "DocBuilder.h"
-#include <mongocxx/exception/bulk_write_exception.hpp>
 #include <sstream>
 #include <iomanip>
+#include <unistd.h>
+#include <mongocxx/exception/bulk_write_exception.hpp>
+#include "MongoDBWriterBackend.h"
+#include "DocBuilder.h"
 #include "writers/BufferedMongoDBWriter.h"
 #include "writers/RotatedBufferedMongoDBWriter.h"
 #include "writers/DailyBufferedMongoDBWriter.h"
