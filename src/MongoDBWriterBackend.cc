@@ -34,6 +34,7 @@ MongoDBWriterBackend::~MongoDBWriterBackend() {
 bool MongoDBWriterBackend::DoInit(const WriterInfo &info, int num_fields,
                          const Field *const *fields) {
 
+    //DEBUG HELPER
     if (BifConst::LogMongo::debug) {
         std::cout << "[logging::writer::MongoDB]" << std::endl;
         std::cout << "  path=" << info.path << std::endl;
@@ -53,39 +54,8 @@ bool MongoDBWriterBackend::DoInit(const WriterInfo &info, int num_fields,
         std::cout << std::endl;
     }
 
-    mongocxx::options::client client_opts{};
-    mongocxx::options::ssl ssl_opts{};
-
-    string CAFile = LookupParam( info, "CAFile");
-    if( !CAFile.empty() ){
-       if( access( CAFile.c_str(), F_OK ) == 0 ){
-          ssl_opts.ca_file( CAFile );
-          ssl_opts.allow_invalid_certificates( false );
-       }
-       else {
-          return false;
-       }
-    }
-
-    string verifyCert = LookupParam( info, "verifyCert");
-    if( !verifyCert.empty() ){
-       if( verifyCert == "false" ){
-          ssl_opts.allow_invalid_certificates( true );
-       }
-    }
-
-    string pemFile = LookupParam( info, "x509ClientCert");
-    if( !pemFile.empty() ){
-       if( access( pemFile.c_str(), F_OK ) == 0 ){
-          ssl_opts.pem_file( pemFile );
-          ssl_opts.allow_invalid_certificates( false );
-       }
-       else {
-         return false;
-       }
-    }
-
-    client_opts.ssl_opts( ssl_opts );
+    //URI, DB, COLLECTION
+    mongocxx::instance& instance = mongocxx::instance::current();
 
     std::string uriInfo = LookupParam(info, "uri");
     if (uriInfo.empty()) {
@@ -102,13 +72,48 @@ bool MongoDBWriterBackend::DoInit(const WriterInfo &info, int num_fields,
     std::string logCollection = info.path;
 
 
-    mongocxx::instance& instance = mongocxx::instance::current();
-    this->client = make_shared<const mongocxx::client>(uri, client_opts);
+    //SECURITY
+    if (uri.ssl()) {
+        mongocxx::options::client client_opts{};
+        mongocxx::options::ssl ssl_opts{};
 
+        string CAFile = LookupParam(info, "CAFile");
+        if (!CAFile.empty()) {
+            if (access(CAFile.c_str(), F_OK) == 0) {
+                ssl_opts.ca_file(CAFile);
+                ssl_opts.allow_invalid_certificates(false);
+            } else {
+                return false;
+            }
+        }
+
+        string verifyCert = LookupParam(info, "verifyCert");
+        if (verifyCert == "false") {
+            ssl_opts.allow_invalid_certificates(true);
+        }
+
+        string pemFile = LookupParam(info, "x509ClientCert");
+        if (!pemFile.empty()) {
+            if (access(pemFile.c_str(), F_OK) == 0) {
+                ssl_opts.pem_file(pemFile);
+                ssl_opts.allow_invalid_certificates(false);
+            } else {
+                return false;
+            }
+        }
+
+        client_opts.ssl_opts(ssl_opts);
+        this->client = make_shared<const mongocxx::client>(uri, client_opts);
+    } else {
+        this->client = make_shared<const mongocxx::client>(uri);
+    }
+
+
+    //LOG ORGANIZATION
     std::string rotate = LookupParam(info, "rotate");
     std::transform(rotate.begin(), rotate.end(), rotate.begin(), ::tolower);
 
-    std::string splitOnDay = LookupParam(info, "splitOnDay");
+    std::string splitOnDay = LookupParam(info, "splitByDate");
     std::transform(splitOnDay.begin(), splitOnDay.end(), splitOnDay.begin(), ::tolower);
 
     if (rotate == "true" || rotate == "t") {
