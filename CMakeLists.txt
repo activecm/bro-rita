@@ -24,7 +24,6 @@ link_directories(${LIBMONGOCXX_LIBRARY_DIRS})
 link_directories(${LIBBSONCXX_LIBRARY_DIRS})
 
 bro_plugin_begin(OCMDev MongoDBWriter)
-bro_plugin_bif(src/MongoDBWriter.bif)
 bro_plugin_cc(src/writers/MongoDBBuffer.cc)
 bro_plugin_cc(src/writers/AbstractMongoDBWriter.cc)
 bro_plugin_cc(src/writers/BufferedMongoDBWriter.cc)

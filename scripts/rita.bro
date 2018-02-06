@@ -25,7 +25,6 @@ event bro_init()
                        ["CAFile"] = CA_FILE,
                        ["verifyCert"] = VERIFY_CERT,
                        ["clientCert"] = CLIENT_CERT
-
                    ),
         $writer=Log::WRITER_MONGODB
     ];

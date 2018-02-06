@@ -33,27 +33,6 @@ MongoDBWriterBackend::~MongoDBWriterBackend() {
 
 bool MongoDBWriterBackend::DoInit(const WriterInfo &info, int num_fields,
                          const Field *const *fields) {
-
-    //DEBUG HELPER
-    if (BifConst::LogMongo::debug) {
-        std::cout << "[logging::writer::MongoDB]" << std::endl;
-        std::cout << "  path=" << info.path << std::endl;
-        std::cout << "  rotation_interval=" << info.rotation_interval << std::endl;
-        std::cout << "  rotation_base=" << info.rotation_base << std::endl;
-
-        for (const auto &i : info.config) {
-            std::cout << "  config[" << i.first << "] = " << i.second << std::endl;
-        }
-
-        for (int i = 0; i < num_fields; i++) {
-            const Field *field = fields[i];
-            std::cout << "  field " << field->name << ": "
-                      << type_name(field->type) << std::endl;
-        }
-
-        std::cout << std::endl;
-    }
-
     //URI, DB, COLLECTION
     mongocxx::instance& instance = mongocxx::instance::current();
 

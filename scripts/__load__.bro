@@ -7,7 +7,7 @@
 # scripts/<plugin-namespace>/<plugin-name>/__load__.bro instead.
 #
 
-@load ./init.bro
+#@load ./init.bro
 
 
 

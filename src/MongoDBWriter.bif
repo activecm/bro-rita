@@ -1,3 +1,0 @@
-module LogMongo;
-
-const debug: bool;
