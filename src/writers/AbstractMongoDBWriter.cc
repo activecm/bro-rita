@@ -74,7 +74,7 @@ bool AbstractMongoDBWriter::IndexLogCollection(const std::string &targetDB, cons
         indexes.push_back(durationIndex.extract());
 
         bsoncxx::builder::basic::document uidIndex;
-        uidIndex.append(kvp("uid", "hashed"));
+        uidIndex.append(kvp("uid", 1));
         indexes.push_back(uidIndex.extract());
 
     } else if (targetCollection == "http") {
@@ -84,7 +84,7 @@ bool AbstractMongoDBWriter::IndexLogCollection(const std::string &targetDB, cons
         indexes.push_back(userAgentIndex.extract());
 
         bsoncxx::builder::basic::document uidIndex;
-        uidIndex.append(kvp("uid", "hashed"));
+        uidIndex.append(kvp("uid", 1));
         indexes.push_back(uidIndex.extract());
 
     } else if (targetCollection == "dns") {
