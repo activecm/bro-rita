@@ -18,6 +18,7 @@ namespace plugin {
         private:
             bsoncxx::builder::stream::document builder;
             const threading::formatter::Ascii *const formatter;
+            ODesc escaper;
         };
     }
 }

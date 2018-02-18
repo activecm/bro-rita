@@ -1,5 +1,6 @@
 #include "DocBuilder.h"
 #include <bsoncxx/builder/stream/array.hpp>
+#include <threading/SerialTypes.h>
 
 using namespace plugin::OCMDev_MongoDBWriter;
 
@@ -99,10 +100,9 @@ void DocBuilder::addField(const threading::Field *const field, const threading::
         case TYPE_STRING:
         case TYPE_FILE:
         case TYPE_FUNC: {
-                            const auto length = static_cast<unsigned long>(
-                                    value->val.string_val.length
-                                    );
-                            builder << tag << string(value->val.string_val.data, length).c_str();
+                            escaper.Clear();
+                            escaper.AddN(value->val.string_val.data, value->val.string_val.length);
+                            builder << tag << escaper.Description();
                         }
                         break;
         case TYPE_TABLE:
@@ -233,6 +233,7 @@ void DocBuilder::addArrayField(bsoncxx::builder::stream::array & arr, const thre
 }
 
 DocBuilder::DocBuilder(const threading::formatter::Ascii *const formatter) : formatter(formatter) {
+    escaper.EnableEscaping();
 }
 
 bsoncxx::document::value DocBuilder::finalize() {
