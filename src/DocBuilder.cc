@@ -39,8 +39,7 @@ void DocBuilder::addField(const threading::Field *const field, const threading::
             case TYPE_STRING:
             case TYPE_FILE:
             case TYPE_FUNC: {
-                const char* empty = "";
-                builder << tag << empty;
+                builder << tag << "";
             }
                 break;
             case TYPE_TABLE:
@@ -100,6 +99,10 @@ void DocBuilder::addField(const threading::Field *const field, const threading::
         case TYPE_STRING:
         case TYPE_FILE:
         case TYPE_FUNC: {
+                            if (value->val.string_val.length == 0) {
+                                builder << tag << "";
+                                break;
+                            }
                             escaper.Clear();
                             escaper.AddN(value->val.string_val.data, value->val.string_val.length);
                             builder << tag << escaper.Description();
@@ -190,6 +193,10 @@ void DocBuilder::addArrayField(bsoncxx::builder::stream::array & arr, const thre
             case TYPE_STRING:
             case TYPE_FILE:
             case TYPE_FUNC: {
+                                if (value->val.string_val.length == 0) {
+                                    arr << "";
+                                    break;
+                                }
                                 escaper.Clear();
                                 escaper.AddN(value->val.string_val.data, value->val.string_val.length);
                                 arr << escaper.Description();
