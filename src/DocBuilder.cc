@@ -124,12 +124,19 @@ void DocBuilder::addField(const threading::Field *const field, const threading::
                             bool innerSuccess;
                             string innerRep;
 
+                            //TODO: Quirks mode
+                            //quirks: Escape commas in arrays
+                            //https://github.com/bro/bro/blob/master/src/threading/formatters/Ascii.cc#L153
+                            escaper.AddEscapeSequence(",");
+
                             using bsoncxx::builder::stream::array;
                             auto arr = array{};
 
                             for (bro_int_t i = 0; i < size; i++) {
                                 addArrayField( arr,  vals[i] );
                             }
+                            escaper.RemoveEscapeSequence(",");
+
                             builder << tag << arr;
                         }
                         break;
