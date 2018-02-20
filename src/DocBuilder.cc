@@ -183,10 +183,9 @@ void DocBuilder::addArrayField(bsoncxx::builder::stream::array & arr, const thre
             case TYPE_STRING:
             case TYPE_FILE:
             case TYPE_FUNC: {
-                                const auto length = static_cast<unsigned long>(
-                                        value->val.string_val.length
-                                        );
-                                arr << string(value->val.string_val.data, length);
+                                escaper.Clear();
+                                escaper.AddN(value->val.string_val.data, value->val.string_val.length);
+                                arr << escaper.Description();
                             }
                             break;
             case TYPE_TABLE:
