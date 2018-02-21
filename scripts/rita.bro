@@ -14,8 +14,6 @@ export {
     # Use this option when running RITA each night.
     const ROTATE        = "false" &redef;
 
-    # Experimental (DO NOT USE)
-    const SPLIT_BY_DATE = "false" &redef;
 
     # Security
 
@@ -40,7 +38,6 @@ event bro_init()
                        ["uri"] = URI,
                        ["selectedDB"] = DB,
                        ["rotate"] = ROTATE,
-                       ["splitByDate"] = SPLIT_BY_DATE,
                        ["CAFile"] = CA_FILE,
                        ["verifyCert"] = VERIFY_CERT,
                        ["clientCert"] = CLIENT_CERT
