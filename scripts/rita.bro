@@ -1,4 +1,4 @@
-module LogMongo;
+module RITAWriter;
 
 export {
     # The MongoDB URI contains information on how to contact a MongoDB Server
@@ -42,7 +42,7 @@ event bro_init()
                        ["verifyCert"] = VERIFY_CERT,
                        ["clientCert"] = CLIENT_CERT
                    ),
-        $writer=Log::WRITER_MONGODB
+        $writer=Log::WRITER_RITA
     ];
 
     Log::add_filter(HTTP::LOG, copy(mongoFilter));

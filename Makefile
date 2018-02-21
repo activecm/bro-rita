@@ -24,6 +24,3 @@ clean:
 
 distclean:
 	rm -rf $(cmake_build_dir)
-
-test:
-	make -C tests

@@ -9,7 +9,7 @@ namespace plugin {
     namespace OCMDev_MongoDBWriter {
         const static int PLUGIN_MAJOR = 1;
         const static int PLUGIN_MINOR = 0;
-        const static std::string PLUGIN_NAME = "OCMDev::MongoDBWriter";
+        const static std::string PLUGIN_NAME = "OCMDev::RITAWriter";
     }
 }
 
