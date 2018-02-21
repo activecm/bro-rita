@@ -9,11 +9,6 @@
 set -e
 command="$0 $*"
 
-if [ -e `dirname $0`/configure.plugin ]; then
-    # Include custom additions.
-    . `dirname $0`/configure.plugin
-fi
-
 # Check for `cmake` command.
 type cmake > /dev/null 2>&1 || {
     echo "\
