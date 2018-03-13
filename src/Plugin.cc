@@ -3,9 +3,9 @@
 #include "MongoDBWriterBackend.h"
 #include "Version.h"
 
-namespace plugin { namespace OCMDev_MongoDBWriter { Plugin plugin; }}
+namespace plugin { namespace ActiveCM_MongoDBWriter { Plugin plugin; }}
 
-using namespace plugin::OCMDev_MongoDBWriter;
+using namespace plugin::ActiveCM_MongoDBWriter;
 
 
 plugin::Configuration Plugin::Configure() {

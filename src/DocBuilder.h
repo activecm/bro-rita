@@ -7,7 +7,7 @@
 #include <bsoncxx/builder/stream/array.hpp>
 
 namespace plugin {
-    namespace OCMDev_MongoDBWriter {
+    namespace ActiveCM_MongoDBWriter {
         class DocBuilder {
         public:
             explicit DocBuilder(const threading::formatter::Ascii *formatter);

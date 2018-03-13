@@ -9,7 +9,7 @@
 #include <mongocxx/client.hpp>
 #include "BufferedMongoDBWriter.h"
 namespace plugin {
-    namespace OCMDev_MongoDBWriter {
+    namespace ActiveCM_MongoDBWriter {
         class RotatedBufferedMongoDBWriter : public BufferedMongoDBWriter {
         public:
             explicit RotatedBufferedMongoDBWriter(const std::shared_ptr<const mongocxx::client> &client,

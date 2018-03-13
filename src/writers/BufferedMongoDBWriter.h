@@ -11,7 +11,7 @@
 #include "MongoDBBuffer.h"
 
 namespace plugin {
-    namespace OCMDev_MongoDBWriter {
+    namespace ActiveCM_MongoDBWriter {
         class BufferedMongoDBWriter : public AbstractMongoDBWriter {
         public:
             explicit BufferedMongoDBWriter(const std::shared_ptr<const mongocxx::client> &client,

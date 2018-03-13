@@ -4,7 +4,7 @@
 
 #include <iomanip>
 #include "RotatedBufferedMongoDBWriter.h"
-using namespace plugin::OCMDev_MongoDBWriter;
+using namespace plugin::ActiveCM_MongoDBWriter;
 
 
 RotatedBufferedMongoDBWriter::RotatedBufferedMongoDBWriter(const std::shared_ptr<const mongocxx::client>& client,

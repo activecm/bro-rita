@@ -18,7 +18,7 @@ using bsoncxx::builder::stream::open_document;
 
 using namespace logging;
 using namespace threading;
-using namespace plugin::OCMDev_MongoDBWriter;
+using namespace plugin::ActiveCM_MongoDBWriter;
 using namespace threading;
 using namespace formatter;
 

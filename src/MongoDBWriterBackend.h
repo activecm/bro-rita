@@ -9,7 +9,7 @@
 #include "writers/AbstractMongoDBWriter.h"
 
 namespace plugin {
-    namespace OCMDev_MongoDBWriter {
+    namespace ActiveCM_MongoDBWriter {
 
         class MongoDBWriterBackend : public logging::WriterBackend {
 

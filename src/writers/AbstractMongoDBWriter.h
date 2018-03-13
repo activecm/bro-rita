@@ -9,7 +9,7 @@
 #include <mongocxx/client.hpp>
 #include <memory>
 namespace plugin {
-    namespace OCMDev_MongoDBWriter {
+    namespace ActiveCM_MongoDBWriter {
         class AbstractMongoDBWriter {
         public:
             explicit AbstractMongoDBWriter(std::shared_ptr<const mongocxx::client>);

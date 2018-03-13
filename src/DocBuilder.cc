@@ -2,7 +2,7 @@
 #include <bsoncxx/builder/stream/array.hpp>
 #include <threading/SerialTypes.h>
 
-using namespace plugin::OCMDev_MongoDBWriter;
+using namespace plugin::ActiveCM_MongoDBWriter;
 
 void DocBuilder::addField(const threading::Field *const field, const threading::Value *const value) {
 

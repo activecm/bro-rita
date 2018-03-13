@@ -10,7 +10,7 @@
 #include <mongocxx/client.hpp>
 
 namespace plugin {
-    namespace OCMDev_MongoDBWriter {
+    namespace ActiveCM_MongoDBWriter {
         class MongoDBBuffer {
         public:
             MongoDBBuffer(std::string targetDB, std::string targetCollection);
