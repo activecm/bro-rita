@@ -71,7 +71,7 @@ bool MongoDBWriterBackend::DoInit(const WriterInfo &info, int num_fields,
             ssl_opts.allow_invalid_certificates(true);
         }
 
-        string pemFile = LookupParam(info, "x509ClientCert");
+        string pemFile = LookupParam(info, "clientCert");
         if (!pemFile.empty()) {
             if (access(pemFile.c_str(), F_OK) == 0) {
                 ssl_opts.pem_file(pemFile);
