@@ -1,6 +1,6 @@
 [package]
 description = RITA, Bro IDS connector. 
 tags = bro plugin, MongoDB, writer, security, conn, logging, rita
-build_command = (./configure --bro-dist=%(bro_dist) && make)
+build_command = (./configure --bro-dist=%(bro_dist)s && make)
 version = master
 depends = mongodb >= 3.4
