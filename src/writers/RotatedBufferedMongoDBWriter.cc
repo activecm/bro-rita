@@ -14,6 +14,15 @@ RotatedBufferedMongoDBWriter::RotatedBufferedMongoDBWriter(const std::shared_ptr
 
 }
 
+/** Changes the current database to the next one
+ *
+ * In circumstances where logs are being pulled off the wire it is 
+ * advantageous to spilt the logs into different collections based on day 
+ * (usually).
+ * This function sets the writing collection to the next. Where next is 
+ * determined by GetRotatedDBName()
+ *
+ */
 bool RotatedBufferedMongoDBWriter::Rotate() {
     if(!Flush()) {
         return false;
@@ -23,6 +32,9 @@ bool RotatedBufferedMongoDBWriter::Rotate() {
            this->IndexLogCollection(this->buffer.targetDB, this->buffer.targetCollection);
 }
 
+/** Generates a database name using date as a specifier
+ *
+ */
 std::string RotatedBufferedMongoDBWriter::GenRotatedDBName(const std::string& targetDBBase) {
     auto t = std::time(nullptr);
     auto tm = std::gmtime(&t);

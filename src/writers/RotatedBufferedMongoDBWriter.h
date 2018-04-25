@@ -10,6 +10,9 @@
 #include "BufferedMongoDBWriter.h"
 namespace plugin {
     namespace ActiveCM_MongoDBWriter {
+      /** a Writer class which both supports buffered writes and periodically rotating collections
+       *
+       */
         class RotatedBufferedMongoDBWriter : public BufferedMongoDBWriter {
         public:
             explicit RotatedBufferedMongoDBWriter(const std::shared_ptr<const mongocxx::client> &client,

@@ -19,6 +19,11 @@ bool BufferedMongoDBWriter::Init() {
             this->IndexLogCollection(this->buffer.targetDB, this->buffer.targetCollection);
 }
 
+  /* Checks the writers buffer and if full, write to the database
+   *
+   * Buffered writing is more efficent over a network
+   *
+  */
 bool BufferedMongoDBWriter::Write(bsoncxx::document::value document) {
     if (buffer.Full() && !this->buffer.Flush(*this->client)) {
         return false;

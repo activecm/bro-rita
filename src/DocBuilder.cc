@@ -4,6 +4,25 @@
 
 using namespace plugin::ActiveCM_MongoDBWriter;
 
+/** Converts a Field Value pair to MongoDB types and places it into the builder.
+ *
+ * This function handles the conversion between the bro types/values, and the bsoncxx types.
+ * addField also handles types where the value is missing, replacing the value with either
+ * a zero, false or empty string. Otherwise, the field is converted into the bsoncxx type
+ * and more specifically what RITA expects.
+ *
+ * This function does not handle:
+ * - TYPE_VOID
+ * - TYPE_PATTERN
+ * - TYPE_ANY
+ * - TYPE_UNION
+ * - TYPE_RECORD
+ * - TYPE_LIST
+ * - TYPE_TIMER
+ * - TYPE_OPAQUE
+ * - TYPE_TYPE
+ * - TYPE_ERROR
+ */
 void DocBuilder::addField(const threading::Field *const field, const threading::Value *const value) {
 
     string tag = field->name;

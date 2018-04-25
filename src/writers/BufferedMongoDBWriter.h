@@ -12,6 +12,12 @@
 
 namespace plugin {
     namespace ActiveCM_MongoDBWriter {
+      /** Class for Basic Buffered writing to a database
+       *
+       * Note: Does not rotate databases periodically, for that functionality
+       * use RotatedBuffedMongoDBWriter
+       *
+       */
         class BufferedMongoDBWriter : public AbstractMongoDBWriter {
         public:
             explicit BufferedMongoDBWriter(const std::shared_ptr<const mongocxx::client> &client,

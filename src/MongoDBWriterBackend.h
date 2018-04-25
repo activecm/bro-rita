@@ -9,8 +9,15 @@
 #include "writers/AbstractMongoDBWriter.h"
 
 namespace plugin {
+
     namespace ActiveCM_MongoDBWriter {
 
+      /** MongoDB Bro writer interface class
+       * 
+       * Inherits from Bro's internal Writer class,
+       * Attaches itself to an output stream to push packet data to a MongoDB 
+       * database. 
+       */
         class MongoDBWriterBackend : public logging::WriterBackend {
 
         public:

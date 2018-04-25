@@ -10,6 +10,12 @@
 #include <memory>
 namespace plugin {
     namespace ActiveCM_MongoDBWriter {
+      /** Virtual Base class for MongoDB Writers
+       *
+       * This class holds the Indexing and MetaDatabase functions common to 
+       * all versions of the Writer.
+       * 
+       */
         class AbstractMongoDBWriter {
         public:
             explicit AbstractMongoDBWriter(std::shared_ptr<const mongocxx::client>);

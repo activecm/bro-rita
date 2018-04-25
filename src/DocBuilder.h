@@ -8,6 +8,11 @@
 
 namespace plugin {
     namespace ActiveCM_MongoDBWriter {
+
+      /** Class that contains and interfaces with the MongoDB document
+       *
+       *
+       */
         class DocBuilder {
         public:
             explicit DocBuilder(const threading::formatter::Ascii *formatter);

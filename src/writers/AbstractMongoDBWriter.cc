@@ -24,6 +24,24 @@ bool AbstractMongoDBWriter::Rotate() {
     return true;
 }
 
+ /** Create Rita's Meta Database Entry for the current batch of logs
+  *
+  * Adds Metadata to the MongoDB Database that allows RITA to not double 
+  * process log files.
+  * The MetaDB info includes:
+  * - Database name.
+  * - Whether the database has been analyzed.
+  * - RITA's Use Dates capability (Depricated)
+  * - The version of the Analyzer used
+  * - The version of the importer used ( this program )
+  *
+  * The plugin is written in a way to attempt to avoid reinsertion of the meta
+  * database, as it will throw an exception, Just in case however the write
+  * exception is caught here.
+  *
+  * \return True if everything went well, false if the Database throws an exception
+  *
+  */
 
 bool AbstractMongoDBWriter::CreateMetaEntry(const std::string &targetDB) {
     using bsoncxx::builder::basic::kvp;
@@ -57,6 +75,29 @@ bool AbstractMongoDBWriter::CreateMetaEntry(const std::string &targetDB) {
 
     return true;
 }
+
+  /** Reindexes the database to be searchable more convieniently by RITA
+   *
+   * Changes the indexing scheme for the MongoDB database from its implicit 
+   * indexing to others based on RITA's needs:
+   * -CONN
+   *    -# Packet timestamp
+   *    -# Connection Duration
+   *    -# Identifier for referencing packets cross connection type
+   * -HTTP
+   *    -# User Agent, string representing the:
+   *      - Operating system
+   *      - Software Vendor/version
+   *      - Application Type
+   *      of the sender
+   *    -# Identifier for referencing packets cross connection type
+   * -DNS
+   *    -# Name being queried
+   *
+   *  All types of logs are also sorted based on the originator and 
+   *  recipient of the packet.
+   *
+   */
 
 bool AbstractMongoDBWriter::IndexLogCollection(const std::string &targetDB, const std::string &targetCollection) {
     mongocxx::collection coll = (*this->client)[targetDB][targetCollection];

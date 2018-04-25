@@ -11,6 +11,10 @@
 
 namespace plugin {
     namespace ActiveCM_MongoDBWriter {
+      /** Interface for a MongoDB Buffer
+       *
+       * Handles writing and flushing records with a buffer.
+       */
         class MongoDBBuffer {
         public:
             MongoDBBuffer(std::string targetDB, std::string targetCollection);
