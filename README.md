@@ -46,13 +46,15 @@ either using bro-pkg, or manually via the command-line.
 
 To install the plugin using [bro-pkg](http://bro-package-manager.readthedocs.io/en/stable/), use:
 
-```console
+```
+bro-pkg autoconfig
+sudo bro-pkg refresh --aggregate
 sudo bro-pkg install bro/activecm/bro-rita.git
 ```
 
 To install manually from the cloned repository, use:
 
-```console
+```
 sudo ./configure && make && make install
 ```
 
@@ -96,7 +98,7 @@ The RITAWriter supports the following configuration options via Bro redefines.
 - **RITAWriter::URI**: The [MongoDB URI](https://docs.mongodb.com/manual/reference/connection-string/) contains information on how to contact a MongoDB Server.
   - Default value: **mongodb://localhost:27017**
 
-- **RITAWriter::DB**: Set the name of the database logs will be imported into. If
+- **RITAWriter::DB**: The name of the database logs will be imported into. If
 ROTATE is specified, DB will be used as the base for the names of the databases.
   - Default value: **BRO-IMPORT**
 
@@ -104,15 +106,17 @@ ROTATE is specified, DB will be used as the base for the names of the databases.
 log writer. Use this option when running RITA each night.
   - Default value: **false**
 
-- **RITAWriter::VERIFY_CERT**: As a quick solution, certificate validation may be turned off
-instead of specifying the certificate file. WARNING: this may lead to MITM attacks.
+- **RITAWriter::VERIFY_CERT**: If TLS is enabled (via the URI) server
+authentication may be turned off. WARNING: this may lead to MITM attacks.
   - Default value: **true**
 
-- **RITAWriter::CA_FILE**: If TLS is enabled (via the URI) and a self signed certificate is
-being used on the MongoDB server, specify the path to a copy of that certificate.
+- **RITAWriter::CA_FILE**: If TLS is enabled (via the URI) use the given
+certificate authority file to validate the server certificate. If a self signed
+certificate is being used on the MongoDB server , specify the path to a copy
+of that certificate.
   - Default value: **""**
 
-- **RITAWriter::CLIENT_CERT**:  If using x509 authentication, specify the client certificate file.
+- **RITAWriter::CLIENT_CERT**:  If X.509 authentication is enabled (via the URI), specify the client certificate file.
   - Default value: **""**
 
 ## Type mapping
