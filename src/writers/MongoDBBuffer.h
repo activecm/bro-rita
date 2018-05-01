@@ -10,7 +10,7 @@
 #include <mongocxx/client.hpp>
 
 namespace plugin {
-    namespace ActiveCM_MongoDBWriter {
+    namespace ActiveCM_RITAWriter {
       /** Interface for a MongoDB Buffer
        *
        * Handles writing and flushing records with a buffer.

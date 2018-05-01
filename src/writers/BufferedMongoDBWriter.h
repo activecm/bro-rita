@@ -11,7 +11,7 @@
 #include "MongoDBBuffer.h"
 
 namespace plugin {
-    namespace ActiveCM_MongoDBWriter {
+    namespace ActiveCM_RITAWriter {
       /** Class for Basic Buffered writing to a database
        *
        * Note: Does not rotate databases periodically, for that functionality

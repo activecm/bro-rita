@@ -4,7 +4,7 @@
 
 #include "MongoDBBuffer.h"
 
-using namespace plugin::ActiveCM_MongoDBWriter;
+using namespace plugin::ActiveCM_RITAWriter;
 
 MongoDBBuffer::MongoDBBuffer(std::string targetDB, std::string targetCollection) :
         targetDB{std::move(targetDB)}, targetCollection{std::move(targetCollection)} {

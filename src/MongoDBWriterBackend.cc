@@ -18,14 +18,14 @@ using bsoncxx::builder::stream::open_document;
 
 using namespace logging;
 using namespace threading;
-using namespace plugin::ActiveCM_MongoDBWriter;
+using namespace plugin::ActiveCM_RITAWriter;
 using namespace threading;
 using namespace formatter;
 
 /** MongoDBWriterBackend Constructor, initiates super and the ascii formatter.
  *
- * Even though this is the constructor, the majority of the initiation is done 
- * in the DoInit() function, which is called by Bro lazily, before first call 
+ * Even though this is the constructor, the majority of the initiation is done
+ * in the DoInit() function, which is called by Bro lazily, before first call
  * to DoWrite().
  */
 MongoDBWriterBackend::MongoDBWriterBackend(WriterFrontend *frontend) :
@@ -214,4 +214,3 @@ bool MongoDBWriterBackend::DoHeartbeat(double network_time, double current_time)
     return true;
 }
 #pragma clang diagnostic pop
-

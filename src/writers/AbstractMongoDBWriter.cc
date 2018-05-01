@@ -8,7 +8,7 @@
 #include "AbstractMongoDBWriter.h"
 #include "../Version.h"
 
-using namespace plugin::ActiveCM_MongoDBWriter;
+using namespace plugin::ActiveCM_RITAWriter;
 
 
 AbstractMongoDBWriter::AbstractMongoDBWriter(std::shared_ptr<const mongocxx::client> client) :

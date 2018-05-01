@@ -9,7 +9,7 @@
 #include <mongocxx/client.hpp>
 #include <memory>
 namespace plugin {
-    namespace ActiveCM_MongoDBWriter {
+    namespace ActiveCM_RITAWriter {
       /** Virtual Base class for MongoDB Writers
        *
        * This class holds the Indexing and MetaDatabase functions common to 

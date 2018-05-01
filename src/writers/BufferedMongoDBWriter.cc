@@ -5,7 +5,7 @@
 #include <mongocxx/result/insert_many.hpp>
 #include "BufferedMongoDBWriter.h"
 
-using namespace plugin::ActiveCM_MongoDBWriter;
+using namespace plugin::ActiveCM_RITAWriter;
 
 
 BufferedMongoDBWriter::BufferedMongoDBWriter(const std::shared_ptr<const mongocxx::client>& client,

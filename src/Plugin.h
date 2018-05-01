@@ -5,7 +5,7 @@
 #include <plugin/Plugin.h>
 
 namespace plugin {
-    namespace ActiveCM_MongoDBWriter {
+    namespace ActiveCM_RITAWriter {
 
         class Plugin : public ::plugin::Plugin {
         protected:

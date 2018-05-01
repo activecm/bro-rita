@@ -9,7 +9,7 @@
 #include <mongocxx/client.hpp>
 #include "BufferedMongoDBWriter.h"
 namespace plugin {
-    namespace ActiveCM_MongoDBWriter {
+    namespace ActiveCM_RITAWriter {
       /** a Writer class which both supports buffered writes and periodically rotating collections
        *
        */

@@ -7,7 +7,7 @@
 #include <bsoncxx/builder/stream/array.hpp>
 
 namespace plugin {
-    namespace ActiveCM_MongoDBWriter {
+    namespace ActiveCM_RITAWriter {
 
       /** Class that contains and interfaces with the MongoDB document
        *

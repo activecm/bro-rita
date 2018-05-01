@@ -1,4 +1,4 @@
-Logging to MongoDB with ActiveCM::MongoDBWriter
+Logging to MongoDB with ActiveCM::RITAWriter
 =================================
 
 Introduction and Warning
@@ -55,9 +55,9 @@ event bro_init()
 }
 ```
 
-This will write to a database named mydb on a locally hosted MongoDB database 
+This will write to a database named mydb on a locally hosted MongoDB database
 running on port 27017. Note that the table will be automatically be created by
-the MongoDB plugin, if it does not yet exist. If a table with the specified 
+the MongoDB plugin, if it does not yet exist. If a table with the specified
 name already exists, it is used.
 
 Type mapping
@@ -87,7 +87,7 @@ types:
 </tr>
 </table>
 
-Empty but expected field have various null values place into them. 
+Empty but expected field have various null values place into them.
 
 
 Configuration options: MongoDB Writer
@@ -99,16 +99,16 @@ passed in $config:
 - *uri*: The MongoDB URI contains information on how to contact a MongoDB Server
 https://docs.mongodb.com/manual/reference/connection-string/
 
-- *selectedDB*: Set the name of the database logs will be imported into. If 
+- *selectedDB*: Set the name of the database logs will be imported into. If
 ROTATE or SPLIT_BY_DATE is specified, DB will be used as the base for the names of the databases.
 
-- *rotate*:  ROTATE turns on database rotation similar to that of Bro's ASCII 
+- *rotate*:  ROTATE turns on database rotation similar to that of Bro's ASCII
 log writer. Use this option when running RITA each night.
 
-- *CAFile*: If TLS is enabled (via the URI) and a self signed certificate is 
+- *CAFile*: If TLS is enabled (via the URI) and a self signed certificate is
 being used on the MongoDB server, specify the path to a copy of that certificate.
 
-- *verifyCert*: As a quick solution, certificate validation may be turned off 
+- *verifyCert*: As a quick solution, certificate validation may be turned off
 instead of specifying the certificate file. WARNING: this may lead to MITM attacks.
 
 - *clientCert*:  If using x509 authentication, specify the client certificate file.

@@ -10,7 +10,7 @@
 
 namespace plugin {
 
-    namespace ActiveCM_MongoDBWriter {
+    namespace ActiveCM_RITAWriter {
 
       /** MongoDB Bro writer interface class
        * 

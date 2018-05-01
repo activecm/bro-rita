@@ -2,7 +2,7 @@
 #include <bsoncxx/builder/stream/array.hpp>
 #include <threading/SerialTypes.h>
 
-using namespace plugin::ActiveCM_MongoDBWriter;
+using namespace plugin::ActiveCM_RITAWriter;
 
 /** Converts a Field Value pair to MongoDB types and places it into the builder.
  *
