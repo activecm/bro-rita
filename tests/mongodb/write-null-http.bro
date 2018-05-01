@@ -3,6 +3,7 @@
 # @TEST-EXEC: bro %INPUT || true
 # @TEST-EXEC: mongo mongodb://localhost:27017/BRO-BTEST --quiet --eval "db.getCollection('http').find({}, {'_id': 0})" > write-http.out
 # @TEST-EXEC: mongo mongodb://localhost:27017/BRO-BTEST --quiet --eval "db.getCollection('http').drop()" > /dev/null
+# @TEST-EXEC: mongo mongodb://localhost:27017/MetaDatabase --quiet --eval "db.getCollection('databases').deleteMany({'name': 'BRO-BTEST'})" > /dev/null || true
 # @TEST-EXEC: btest-diff write-http.out
 
 # Test Record with all possible null types.

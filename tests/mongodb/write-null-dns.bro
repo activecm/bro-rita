@@ -3,6 +3,7 @@
 # @TEST-EXEC: bro %INPUT || true
 # @TEST-EXEC: mongo mongodb://localhost:27017/BRO-BTEST --quiet --eval "db.getCollection('dns').find({}, {'_id': 0})" > write-dns.out
 # @TEST-EXEC: mongo mongodb://localhost:27017/BRO-BTEST --quiet --eval "db.getCollection('dns').drop()" > /dev/null
+# @TEST-EXEC: mongo mongodb://localhost:27017/MetaDatabase --quiet --eval "db.getCollection('databases').deleteMany({'name': 'BRO-BTEST'})" > /dev/null || true
 # @TEST-EXEC: btest-diff write-dns.out
 
 # Test Record with all possible null types.
