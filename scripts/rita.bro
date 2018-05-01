@@ -6,7 +6,7 @@ export {
     const URI           = "mongodb://localhost:27017" &redef;
 
     # Set the name of the database logs will be imported into.
-    # If ROTATE or SPLIT_BY_DATE is specified, DB will be used as
+    # If ROTATE is specified, DB will be used as
     # the base for the names of the databases.
     const DB            = "BRO-IMPORT" &redef;
 
