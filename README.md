@@ -25,18 +25,18 @@ provided [here](http://mongodb.github.io/mongo-cxx-driver/mongocxx-v3/installati
 However, the following script should work on most systems.
 ```
 cd /tmp
-wget -q https://github.com/mongodb/mongo-c-driver/releases/download/1.9.2/mongo-c-driver-1.9.2.tar.gz \
-tar xzf mongo-c-driver-1.9.2.tar.gz \
-cd mongo-c-driver-1.9.2 \
-./configure --disable-automatic-init-and-cleanup --enable-static \
-make \
-sudo make install \
-cd /tmp \
-wget -q https://github.com/mongodb/mongo-cxx-driver/archive/r3.1.3.tar.gz \
-tar xzf r3.1.3.tar.gz \
-cd mongo-cxx-driver-r3.1.3/build \
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local .. \
-make \
+wget -q https://github.com/mongodb/mongo-c-driver/releases/download/1.9.2/mongo-c-driver-1.9.2.tar.gz
+tar xzf mongo-c-driver-1.9.2.tar.gz
+cd mongo-c-driver-1.9.2
+./configure --disable-automatic-init-and-cleanup --enable-static
+make
+sudo make install
+cd /tmp
+wget -q https://github.com/mongodb/mongo-cxx-driver/archive/r3.1.3.tar.gz
+tar xzf r3.1.3.tar.gz
+cd mongo-cxx-driver-r3.1.3/build
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local ..
+make
 sudo make install
 ```
 
