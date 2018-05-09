@@ -15,9 +15,9 @@ First, install RITA, Bro IDS, and MongoDB.
 
 Next, install the following dependencies:
 
-Debian packages: `pkg-config libssl-dev libsasl2-dev perl make cmake clang gcc g++ git`
+Debian packages: `pkg-config libssl-dev libsasl2-dev libsnappy-dev perl make cmake clang gcc g++ git`
 
-Alpine linux packages: `pkgconf openssl-dev cyrus-sasl-dev perl make cmake clang gcc g++ git`
+Alpine linux packages: `pkgconf openssl-dev cyrus-sasl-dev snappy-dev perl make cmake clang gcc g++ git`
 
 
 Then, install the MongoDB C++ driver, mongocxx. Official instructions are
