@@ -36,6 +36,7 @@ wget -q https://github.com/mongodb/mongo-cxx-driver/archive/r3.1.3.tar.gz
 tar xzf r3.1.3.tar.gz
 cd mongo-cxx-driver-r3.1.3/build
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local ..
+sudo make EP_mnmlstc_core
 make
 sudo make install
 ```
