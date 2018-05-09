@@ -55,7 +55,8 @@ bool AbstractMongoDBWriter::CreateMetaEntry(const std::string &targetDB) {
     metaDBDoc.append(kvp("analyze_version", std::string("")));
     metaDBDoc.append(kvp("import_version", std::string("v") +
             std::to_string(PLUGIN_MAJOR) + "." +
-            std::to_string(PLUGIN_MINOR) + "-" + PLUGIN_NAME));
+            std::to_string(PLUGIN_MINOR) + "." +
+	    std::to_string(PLUGIN_PATCH) + "+" + PLUGIN_NAME_SEMVER));
 
     try {
         //assume this is a new database
