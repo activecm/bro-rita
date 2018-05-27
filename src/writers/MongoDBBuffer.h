@@ -8,6 +8,7 @@
 #include <vector>
 #include <bsoncxx/document/value.hpp>
 #include <mongocxx/client.hpp>
+#include <logging/WriterBackend.h>
 
 namespace plugin {
     namespace ActiveCM_RITAWriter {
@@ -33,6 +34,7 @@ namespace plugin {
             std::vector<bsoncxx::document::value> documents;
         private:
             mongocxx::options::insert insertOptions;
+            Reporter reporter;
         };
     }
 }

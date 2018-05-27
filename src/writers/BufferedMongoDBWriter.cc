@@ -17,13 +17,13 @@ BufferedMongoDBWriter::BufferedMongoDBWriter(const std::shared_ptr<const mongocx
 bool BufferedMongoDBWriter::Init() {
     if ( !this->CreateMetaEntry(this->buffer.targetDB) )
     {
-      InternalWarning("Unable to Create MetaDatabase entry.");
+      reporter.InternalWarning("Unable to Create MetaDatabase entry.");
       return false;
     }
 
     if ( !this->IndexLogCollection(this->buffer.targetDB, this->buffer.targetCollection) )
     {
-      InternalWarning("Unable to index selected Database.");
+      reporter.InternalWarning("Unable to index selected Database.");
       return false;
     }
 

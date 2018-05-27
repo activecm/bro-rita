@@ -4,6 +4,7 @@
 #include <mongocxx/exception/bulk_write_exception.hpp>
 #include "MongoDBWriterBackend.h"
 #include "DocBuilder.h"
+#include "Reporter.h"
 #include "writers/BufferedMongoDBWriter.h"
 #include "writers/RotatedBufferedMongoDBWriter.h"
 
@@ -92,7 +93,7 @@ bool MongoDBWriterBackend::DoInit(const WriterInfo &info, int num_fields,
                 ssl_opts.allow_invalid_certificates(false);
             } else {
               InternalWarning("Encountered Problem reading Certificate Authority File.");
-              InternalWarning("File Access failed with error number: &d", errno );
+              //reporter.InternalWarning("File Access failed with error number: &d", errno );
               return false;
             }
         }
@@ -109,7 +110,10 @@ bool MongoDBWriterBackend::DoInit(const WriterInfo &info, int num_fields,
                 ssl_opts.allow_invalid_certificates(false);
             } else {
               InternalWarning("Encountered Problem reading Client Certification File.");
-              InternalWarning("File Access failed with error number: &d", errno );
+              //The version of this function that allows this resides elsewhere
+              //It would be nice to output this so the error messages are more 
+              //helpful.
+              //reporter.InternalWarning("File Access failed with error number: &d", errno );
                 return false;
             }
         }
