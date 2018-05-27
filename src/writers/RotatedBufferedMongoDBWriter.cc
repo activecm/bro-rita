@@ -25,11 +25,23 @@ RotatedBufferedMongoDBWriter::RotatedBufferedMongoDBWriter(const std::shared_ptr
  */
 bool RotatedBufferedMongoDBWriter::Rotate() {
     if(!Flush()) {
+        InternalWarning("Unable to flush buffer during Database Rotation.");
         return false;
     }
+
     this->buffer.targetDB = GenRotatedDBName(this->targetDBBase);
-    return CreateMetaEntry(this->buffer.targetDB) &&
-           this->IndexLogCollection(this->buffer.targetDB, this->buffer.targetCollection);
+
+    if( !CreateMetaEntry(this->buffer.targetDB) )
+    {
+      InternalWarning("Unable to create Metadatabase entry.");
+      return false;
+    }
+    if( !this->IndexLogCollection(this->buffer.targetDB, this->buffer.targetCollection) ) 
+    {
+      InternalWarning("Unable to index Rotated Database.");
+      return false;
+    }
+      return true;
 }
 
 /** Generates a database name using date as a specifier

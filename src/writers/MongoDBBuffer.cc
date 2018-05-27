@@ -41,6 +41,7 @@ bool MongoDBBuffer::Flush(const mongocxx::client &client) {
     bsoncxx::stdx::optional<mongocxx::result::insert_many> result =
             coll.insert_many(this->documents, this->insertOptions);
     if (!result) {
+        InternalWarning("Buffered document flush failed.");
         return false;
     }
     this->documents.clear();

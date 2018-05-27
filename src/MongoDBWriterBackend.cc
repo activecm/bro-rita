@@ -91,7 +91,9 @@ bool MongoDBWriterBackend::DoInit(const WriterInfo &info, int num_fields,
                 ssl_opts.ca_file(CAFile);
                 ssl_opts.allow_invalid_certificates(false);
             } else {
-                return false;
+              InternalWarning("Encountered Problem reading Certificate Authority File.");
+              InternalWarning("File Access failed with error number: &d", errno );
+              return false;
             }
         }
 
@@ -106,6 +108,8 @@ bool MongoDBWriterBackend::DoInit(const WriterInfo &info, int num_fields,
                 ssl_opts.pem_file(pemFile);
                 ssl_opts.allow_invalid_certificates(false);
             } else {
+              InternalWarning("Encountered Problem reading Client Certification File.");
+              InternalWarning("File Access failed with error number: &d", errno );
                 return false;
             }
         }
